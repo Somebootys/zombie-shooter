@@ -23,7 +23,7 @@ pub fn spawn_player(    mut commands: Commands,
 
     commands.spawn((
         SpriteBundle {
-            transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
+            transform: Transform::from_xyz(0.0, 0.0, 0.0),
             texture: asset_server.load("graphic/player.png"),
             ..default()
         },
