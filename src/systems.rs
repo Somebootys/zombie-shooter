@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-
+use crate::components::{MainCamera};
 pub struct SetupPlugin;
 
 impl Plugin for SetupPlugin {
@@ -10,9 +10,7 @@ impl Plugin for SetupPlugin {
 }
 
 
-/// Used to help identify our main camera
-#[derive(Component)]
-pub struct MainCamera;
+
 
 pub fn setup(mut commands: Commands) {
     commands.spawn((Camera2dBundle::default(), MainCamera));

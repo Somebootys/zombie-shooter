@@ -1,15 +1,9 @@
 use bevy::prelude::*;
 use bevy::window::Window;
-use bevy::window::PrimaryWindow;
+
 use libm;
 
-use crate::systems::MainCamera;
-
-
-
-/// This system prints out all mouse events as they come in
-#[derive(Component)]
-pub struct Player {}
+use crate::components::{Player, MainCamera};
 
 const PLAYER_SPEED: f32 = 500.0;
 
@@ -17,9 +11,7 @@ const PLAYER_SPEED: f32 = 500.0;
 
 
 pub fn spawn_player(    mut commands: Commands,
-    window_query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,) {
-    let window = window_query.get_single().unwrap();
 
     commands.spawn((
         SpriteBundle {
@@ -43,7 +35,7 @@ pub fn print_mouse_events_system(
     keyboard_input: Res<Input<KeyCode>>,
     
      // need to get window dimensions
-     mut windows: Query<&mut Window>,
+    mut windows: Query<&mut Window>,
      // query to get camera transform
      camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
 
@@ -74,8 +66,10 @@ pub fn print_mouse_events_system(
             
 
             //Rotate the sprite around the z axis by the angle. transform.rotation takes a Quat, also needs to be in radians, so no need to convert the angle.
-           
             transform.rotation = Quat::from_rotation_z(angle);
+        
+            
+
 
 
             let mut direction = Vec3::ZERO;
@@ -100,19 +94,7 @@ pub fn print_mouse_events_system(
 //let camera_transform = camera_query.single().unwrap();
 
 transform.translation += direction * PLAYER_SPEED * time.delta_seconds();
-            
+    
+            }
         }
-    }
-
-    
-    
-    
-
-   
-
-    
-
-
-
-   
 }

@@ -1,11 +1,11 @@
 use bevy::prelude::*;
-use crate::player::systems::{Player};
+use crate::components::{Player};
 
 
 
 
 
-const SPRITE_SCALE: f32 = 0.5;
+
 
 
 
