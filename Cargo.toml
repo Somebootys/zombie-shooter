@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.10.1"
+bevy_rapier2d = { version = "*", features = [ "simd-stable", "debug-render-2d" ] }
 libm = "0.2.7"
+bevy-inspector-egui = "0.18.3"
