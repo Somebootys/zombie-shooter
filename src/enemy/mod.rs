@@ -1,6 +1,6 @@
 use bevy::prelude::*;
-
-use crate::components::{Enemy, ENEMY_SPRITE_SIZE};
+//use bevy_rapier2d::prelude::*;
+use crate::components::{ColliderSquare, Enemy, Health, ENEMY_SPRITE_SIZE};
 
 pub struct EnemyPlugin;
 
@@ -18,5 +18,9 @@ pub fn spawn_enemy(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         },
         Enemy {},
+        ColliderSquare {
+            dimension: Vec2::new(ENEMY_SPRITE_SIZE / 2.0, ENEMY_SPRITE_SIZE / 2.0),
+        },
+        Health { health: 100 },
     ));
 }

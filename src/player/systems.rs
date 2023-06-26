@@ -2,28 +2,26 @@ use bevy::prelude::*;
 use bevy::window::Window;
 
 use crate::components::{
-    Bullet, MainCamera, Movable, Player, Velocity, BULLETSPEED, PLAYER_SPRITE_SIZE,
+    Bullet, ColliderSquare, MainCamera, Movable, Player, Velocity, BULLETSPEED, PLAYER_SPRITE_SIZE,
 };
-use bevy_rapier2d::prelude::*;
+//use bevy_rapier2d::prelude::*;
 use libm;
 use std::f32::consts::PI;
 
 const PLAYER_SPEED: f32 = 500.0;
 
 pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands
-        .spawn((
-            RigidBody::Dynamic,
-            Collider::cuboid(10.0_f32, 10.0f32),
-            ColliderMassProperties::Density(0.0),
-            SpriteBundle {
-                transform: Transform::from_xyz(0.0, 0.0, 0.0),
-                texture: asset_server.load("graphic/player.png"),
-                ..default()
-            },
-            Player {},
-        ))
-        .insert(ActiveEvents::COLLISION_EVENTS);
+    commands.spawn((
+        ColliderSquare {
+            dimension: Vec2::new(PLAYER_SPRITE_SIZE, PLAYER_SPRITE_SIZE),
+        },
+        SpriteBundle {
+            transform: Transform::from_xyz(0.0, 0.0, 0.0),
+            texture: asset_server.load("graphic/player.png"),
+            ..default()
+        },
+        Player {},
+    ));
 }
 
 /// This system prints out all mouse events as they come in
