@@ -6,6 +6,7 @@ use crate::components::{
 };
 use bevy_rapier2d::prelude::*;
 use libm;
+use std::f32::consts::PI;
 
 const PLAYER_SPEED: f32 = 500.0;
 
@@ -76,7 +77,7 @@ pub fn print_mouse_events_system(
                 spawn_transform.translation =
                     transform.translation + Vec3::new(offset_laser_x, offset_laser_y, 0.0);
                 spawn_transform.rotation =
-                    Quat::from_axis_angle(Vec3::new(0., 0., 1.), angle - 3.14_f32 / 2.0_f32);
+                    Quat::from_axis_angle(Vec3::new(0., 0., 1.), angle - PI / 2.0_f32);
 
                 cmd.spawn((
                     SpriteBundle {
