@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 use bevy::window::Window;
 
-use crate::components::{Bullet, MainCamera, Movable, Player, Velocity, BULLETSPEED};
+use crate::components::{
+    Bullet, MainCamera, Movable, Player, Velocity, BULLETSPEED, PLAYER_SPRITE_SIZE,
+};
 use bevy_rapier2d::prelude::*;
 use libm;
 
@@ -61,11 +63,15 @@ pub fn print_mouse_events_system(
             //Rotate the sprite around the z axis by the angle. transform.rotation takes a Quat, also needs to be in radians, so no need to convert the angle.
             transform.rotation = Quat::from_rotation_z(angle);
 
-            //TODO: make an offset for the laser spawn point so it doesn't spawn out the ass of the  player
+            //TODO: review if this is the best way to handle the offset
 
             if buttons.just_released(MouseButton::Left) {
-                let offset_laser_x = 0.0_f32;
-                let offset_laser_y = 0.0_f32;
+                let c = PLAYER_SPRITE_SIZE.clone();
+                let a = libm::cosf(angle) * c;
+                let b: f32 = libm::sinf(angle) * c;
+
+                let offset_laser_x = a;
+                let offset_laser_y = b;
                 let mut spawn_transform = Transform::from_scale(Vec3::splat(1.0));
                 spawn_transform.translation =
                     transform.translation + Vec3::new(offset_laser_x, offset_laser_y, 0.0);
