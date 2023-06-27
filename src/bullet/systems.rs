@@ -4,6 +4,7 @@ use crate::components::{
     Bullet, ColliderSquare, Enemy, Movable, Velocity, BULLET_SPRITE_DIMENSION,
 };
 use bevy::sprite::collide_aabb::collide;
+use std::collections::HashSet;
 //use bevy_rapier2d::prelude::*;
 
 const BULLET_RANGE: f32 = 1000.0;
@@ -46,8 +47,18 @@ pub fn bullet_enemy_collision(
 
     mut cmd: Commands,
 ) {
+    let mut despawned_entities: HashSet<Entity> = HashSet::new();
     for (bullet_entity, bullet_collider, bullet_transform) in query_bullet.iter() {
-        for (_enemy_entity, enemy_collider, enemy_transform) in query_enemy.iter() {
+        if despawned_entities.contains(&bullet_entity) {
+            continue;
+        }
+        for (enemy_entity, enemy_collider, enemy_transform) in query_enemy.iter() {
+            if despawned_entities.contains(&enemy_entity)
+                || despawned_entities.contains(&bullet_entity)
+            {
+                continue;
+            }
+
             let collision = collide(
                 bullet_transform.translation,
                 bullet_collider.dimension,
@@ -57,10 +68,11 @@ pub fn bullet_enemy_collision(
 
             // perform the collision
             if collision.is_some() {
-                // remove the player
+                // remove the enemy
 
                 // remove the laser
                 cmd.entity(bullet_entity).despawn();
+                despawned_entities.insert(bullet_entity);
 
                 break;
             }

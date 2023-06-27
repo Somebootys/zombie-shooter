@@ -11,6 +11,7 @@ impl Plugin for EnemyPlugin {
 }
 
 pub fn spawn_enemy(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let off_set = 30.0;
     commands.spawn((
         SpriteBundle {
             transform: Transform::from_xyz(ENEMY_SPRITE_SIZE, ENEMY_SPRITE_SIZE, 0.0),
@@ -19,7 +20,10 @@ pub fn spawn_enemy(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         Enemy {},
         ColliderSquare {
-            dimension: Vec2::new(ENEMY_SPRITE_SIZE / 2.0, ENEMY_SPRITE_SIZE / 2.0),
+            dimension: Vec2::new(
+                ENEMY_SPRITE_SIZE / 2.0 - off_set,
+                ENEMY_SPRITE_SIZE / 2.0 - off_set,
+            ),
         },
         Health { health: 100 },
     ));
