@@ -35,6 +35,12 @@ pub struct Health {
     pub health: i32,
 }
 
+#[derive(Resource, Debug)]
+pub struct WinSize {
+    pub width: f32,
+    pub height: f32,
+}
+
 pub const PLAYER_SPRITE_SIZE: f32 = 50.0;
 pub const ENEMY_SPRITE_SIZE: f32 = 75.0;
 pub const BULLETSPEED: f32 = 1000.0;
