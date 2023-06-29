@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::components::{
-    Bullet, ColliderSquare, Enemy, Movable, Velocity, WinSize, BULLET_SPRITE_DIMENSION,
+    Bullet, ColliderSquare, Enemy, Movable, Velocity, BULLET_SPRITE_DIMENSION,
 };
 use bevy::sprite::collide_aabb::collide;
 use std::collections::HashSet;
@@ -44,7 +44,6 @@ pub fn update_bullets(
 pub fn bullet_enemy_collision(
     query_bullet: Query<(Entity, &ColliderSquare, &Transform), With<Bullet>>,
     query_enemy: Query<(Entity, &ColliderSquare, &Transform), With<Enemy>>,
-    asset_server: Res<WinSize>,
     mut cmd: Commands,
 ) {
     let mut despawned_entities: HashSet<Entity> = HashSet::new();
@@ -69,7 +68,7 @@ pub fn bullet_enemy_collision(
             // perform the collision
             if collision.is_some() {
                 // remove the enemy
-                println!("WinSize {:?}", asset_server);
+               
                 // remove the laser
                 cmd.entity(bullet_entity).despawn();
                 despawned_entities.insert(bullet_entity);

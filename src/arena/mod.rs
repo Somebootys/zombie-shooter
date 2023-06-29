@@ -1,16 +1,11 @@
 use bevy::prelude::*;
 
-//use crate::components::{ };
+use crate::components::{TileIndices, ArenaSize, };
 
 pub const TILE_SIZE: f32 = 50_f32;
-pub const TILE_TYPES: i8 = 3;
+pub const TILE_TYPES: usize = 3;
 pub const VERTS_IN_QUAD: i8 = 4;
 
-#[derive(Component)]
-pub struct TileIndices {
-    pub first: usize,
-    pub last: usize,
-}
 
 pub struct ArenaPlugin;
 
@@ -23,8 +18,105 @@ impl Plugin for ArenaPlugin {
 pub fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
+    // width and height of the arena
+    let arena_size = ArenaSize {
+        width: 500.0,
+        height: 500.0,
+    };
+
+    
+
+   
+
+
+    let world_width = (arena_size.width as i32)/(TILE_SIZE as i32);
+    let world_height = (arena_size.width as i32)/(TILE_SIZE as i32);
+    commands.insert_resource(arena_size);
+
+    
+
+
+
+    for w in 0..world_width {
+        for h in 0..(world_height) {
+
+
+            let texture_handle = asset_server.load("graphic/background_sheet.png");
+            let texture_atlas = TextureAtlas::from_grid(
+                texture_handle,
+                Vec2::new(TILE_SIZE, TILE_SIZE),
+                1,
+                4,
+                None,
+                None,
+            );
+            let texture_atlas_handle = texture_atlases.add(texture_atlas);
+            let tile_indices = TileIndices { first: 0, last: TILE_TYPES };
+            let x = -640 as f32 + w as f32 * TILE_SIZE + TILE_SIZE;
+            let y = -360 as f32 + h as f32 * TILE_SIZE + TILE_SIZE;
+            let z = 0.0;
+
+            println!("h = {}, w = {}", h, w);
+
+            if h == 0 || h == world_height -1 || 
+                w == 0 || w == world_width-1
+            {
+                // Use the wall texture
+                commands.spawn((
+                    SpriteSheetBundle {
+                        texture_atlas: texture_atlas_handle,
+                        sprite: TextureAtlasSprite::new(tile_indices.last),
+                        transform: Transform {
+                            translation: Vec3::new(x, y, z),
+            
+                            rotation: Quat::IDENTITY,
+            
+                            scale: Vec3::splat(1.0),
+                        },
+                        ..default()
+                    },
+                    tile_indices,
+                ));
+
+            }
+            else {
+                // Use the floor texture
+                commands.spawn((
+                    SpriteSheetBundle {
+                        texture_atlas: texture_atlas_handle.clone(),
+                        sprite: TextureAtlasSprite::new(tile_indices.first),
+                        transform: Transform {
+                            translation: Vec3::new(x, y, z),
+            
+                            rotation: Quat::IDENTITY,
+            
+                            scale: Vec3::splat(1.0),
+                        },
+                        ..default()
+                    },
+                    tile_indices,
+                ));
+             // Load the texture atlas containing our sprites. Texture atlases are a
+            // collection of smaller images, combined into a single larger image.
+            
+           
+
+            
+        }
+    }
+
+      
+
+     
+    }
+}
+  
+/*
+ // Load the texture atlas containing our sprites. Texture atlases are a
+    // collection of smaller images, combined into a single larger image.
     let texture_handle = asset_server.load("graphic/background_sheet.png");
     let texture_atlas = TextureAtlas::from_grid(
         texture_handle,
@@ -35,25 +127,28 @@ pub fn setup(
         None,
     );
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
-    // Use only the subset of sprites in the sheet that make up the run animation
-    let tile_indices = TileIndices { first: 0, last: 3 };
+    // Use only the subset of sprites in the sheet that make up the tile types.
+    let tile_indices = TileIndices { first: 0, last: TILE_TYPES };
 
-    commands.spawn((
-        SpriteSheetBundle {
-            texture_atlas: texture_atlas_handle,
-            sprite: TextureAtlasSprite::new(tile_indices.first),
-            transform: Transform {
-                translation: Vec3::ZERO,
+commands.spawn((
+                SpriteSheetBundle {
+                    texture_atlas: texture_atlas_handle,
+                    sprite: TextureAtlasSprite::new(tile_indices.first +1),
+                    transform: Transform {
+                        translation: Vec3::ZERO,
+        
+                        rotation: Quat::IDENTITY,
+        
+                        scale: Vec3::splat(1.0),
+                    },
+                    ..default()
+                },
+                tile_indices,
+            )); */
 
-                rotation: Quat::IDENTITY,
 
-                scale: Vec3::splat(1.0),
-            },
-            ..default()
-        },
-        tile_indices,
-    ));
-}
+    
+
 /*
 pub fn setup(mut commands: Commands,
     asset_server: Res<AssetServer>,

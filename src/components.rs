@@ -35,8 +35,21 @@ pub struct Health {
     pub health: i32,
 }
 
+#[derive(Component, Clone, Copy, Debug)]
+pub struct TileIndices {
+    pub first: usize,
+    pub last: usize,
+}
+
+
 #[derive(Resource, Debug)]
 pub struct WinSize {
+    pub width: f32,
+    pub height: f32,
+}
+
+#[derive(Resource, Debug)]
+pub struct ArenaSize {
     pub width: f32,
     pub height: f32,
 }
