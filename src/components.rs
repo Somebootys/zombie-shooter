@@ -41,7 +41,6 @@ pub struct TileIndices {
     pub last: usize,
 }
 
-
 #[derive(Resource, Debug)]
 pub struct WinSize {
     pub width: f32,

@@ -55,7 +55,7 @@ pub fn print_mouse_events_system(
         // face the player towards the cursor
         if let Ok(mut transform) = player_query.get_single_mut() {
             let (x, y) = (transform.translation.x, transform.translation.y);
-            
+
             // get the angle between the player and the cursor in radians. atan2f is the inverse tangent function y/x, and returns radians.
             let angle = libm::atan2f(world_position.y - y, world_position.x - x);
             let diff = world_position - Vec2::new(x, y);

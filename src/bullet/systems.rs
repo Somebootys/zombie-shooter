@@ -68,7 +68,7 @@ pub fn bullet_enemy_collision(
             // perform the collision
             if collision.is_some() {
                 // remove the enemy
-               
+
                 // remove the laser
                 cmd.entity(bullet_entity).despawn();
                 despawned_entities.insert(bullet_entity);
