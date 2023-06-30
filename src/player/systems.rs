@@ -25,7 +25,7 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 /// This system prints out all mouse events as they come in
-pub fn print_mouse_events_system(
+pub fn player_movement(
     mut cmd: Commands,
     mut player_query: Query<&mut Transform, With<Player>>,
     time: Res<Time>,

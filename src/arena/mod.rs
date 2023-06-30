@@ -46,8 +46,8 @@ pub fn setup(
                 first: 0,
                 last: TILE_TYPES,
             };
-            let x = -250 as f32 + w as f32 * TILE_SIZE + TILE_SIZE;
-            let y = -250 as f32 + h as f32 * TILE_SIZE + TILE_SIZE;
+            let x = -250 as f32 + w as f32 * TILE_SIZE;
+            let y = -250 as f32 + h as f32 * TILE_SIZE;
             let z = 0.0;
 
             // if outer edge then spawn wall

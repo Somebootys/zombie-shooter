@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::components::{
-    Bullet, ColliderSquare, Enemy, Movable, Velocity, BULLET_SPRITE_DIMENSION,
+    Bullet, ColliderSquare, Enemy, Health, Movable, Velocity, BULLET_SPRITE_DIMENSION,
 };
 use bevy::sprite::collide_aabb::collide;
 use std::collections::HashSet;
@@ -44,9 +44,11 @@ pub fn update_bullets(
 pub fn bullet_enemy_collision(
     query_bullet: Query<(Entity, &ColliderSquare, &Transform), With<Bullet>>,
     query_enemy: Query<(Entity, &ColliderSquare, &Transform), With<Enemy>>,
+
     mut cmd: Commands,
 ) {
     let mut despawned_entities: HashSet<Entity> = HashSet::new();
+
     for (bullet_entity, bullet_collider, bullet_transform) in query_bullet.iter() {
         if despawned_entities.contains(&bullet_entity) {
             continue;
