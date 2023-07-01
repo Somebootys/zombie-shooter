@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::components::{
-    Bullet, ColliderSquare, Enemy, Health, Movable, Velocity, BULLET_SPRITE_DIMENSION,
+    Bullet, ColliderSquare, Enemy, Movable, Velocity, BULLET_SPRITE_DIMENSION,
 };
 use bevy::sprite::collide_aabb::collide;
 use std::collections::HashSet;

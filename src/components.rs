@@ -54,10 +54,21 @@ pub struct ArenaSize {
 }
 
 #[derive(Resource)]
-pub struct EnemyCount(u32);
+pub struct EnemyCount(pub usize);
+
+#[derive(Resource)]
+pub struct GameTextures {
+    pub player: Handle<Image>,
+    pub projectile: Handle<Image>,
+    pub enemy_boomer: Handle<Image>,
+    pub enemy_crawler: Handle<Image>,
+    pub enemy_zoomer: Handle<Image>,
+    //arena: Handle<TextureAtlas>,
+}
 
 pub const PLAYER_SPRITE_SIZE: f32 = 50.0;
 pub const ENEMY_SPRITE_SIZE: f32 = 75.0;
 pub const BULLETSPEED: f32 = 1000.0;
 pub const BULLET_SPRITE_DIMENSION: Vec2 = Vec2::new(90.0, 54.0);
 pub const MAX_NUM_ENEMIES: usize = 10;
+pub const TYPES_OF_ENEMIES: usize = 3;
