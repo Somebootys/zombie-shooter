@@ -67,7 +67,9 @@ pub struct GameTextures {
 }
 
 pub const PLAYER_SPRITE_SIZE: f32 = 50.0;
-pub const ENEMY_SPRITE_SIZE: f32 = 75.0;
+pub const ENEMY_BOOMER_SPRITE_SIZE: f32 = 75.0;
+pub const ENEMY_CRAWLER_SPRITE_SIZE: f32 = 75.0;
+pub const ENEMY_ZOOMER_SPRITE_SIZE: f32 = 75.0;
 pub const BULLETSPEED: f32 = 1000.0;
 pub const BULLET_SPRITE_DIMENSION: Vec2 = Vec2::new(90.0, 54.0);
 pub const MAX_NUM_ENEMIES: usize = 10;
