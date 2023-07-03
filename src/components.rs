@@ -53,6 +53,9 @@ pub struct ArenaSize {
     pub height: f32,
 }
 
+#[derive(Component)]
+pub struct CrossHair;
+
 #[derive(Resource)]
 pub struct EnemyCount(pub usize);
 

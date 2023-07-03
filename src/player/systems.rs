@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy::window::Window;
 
 use crate::components::{
-    Bullet, ColliderSquare, MainCamera, Movable, Player, Velocity, BULLETSPEED, PLAYER_SPRITE_SIZE,
+    Bullet, ColliderSquare, MainCamera, Movable, Player, Velocity, BULLETSPEED, PLAYER_SPRITE_SIZE, CrossHair,
 };
 //use bevy_rapier2d::prelude::*;
 use libm;
@@ -115,4 +115,45 @@ pub fn player_movement(
             transform.translation += direction * PLAYER_SPEED * time.delta_seconds();
         }
     }
+}
+
+pub fn spawn_crosshair(mut cmd: Commands,
+    asset_server: Res<AssetServer>){
+    cmd.spawn((
+        SpriteBundle {
+            transform: Transform::from_xyz(0.0, 0.0, 0.0),
+            texture: asset_server.load("graphic/crosshair.png"),
+            ..default()
+        },
+        CrossHair,
+    ));
+
+
+}
+pub fn update_crosshair (
+    // need to get window dimensions
+    mut windows: Query<&mut Window>,
+    // query to get camera transform
+    camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    mut crosshair_query: Query<&mut Transform, With<CrossHair>>){
+    // get the camera info and transform
+    // assuming there is exactly one main camera entity, so query::single() is OK
+    let (camera, camera_transform) = camera_q.single();
+    // get the window that the camera is displaying to (or the primary window)
+    let window = windows.single_mut();
+
+    // check if the cursor is inside the window and get its position
+    // then, ask bevy to convert into world coordinates, and truncate to discard Z
+    if let Some(world_position) = window
+        .cursor_position()
+        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+        .map(|ray| ray.origin.truncate()) {
+            for mut transform in crosshair_query.iter_mut() {
+                transform.translation = Vec3::new(world_position.x,world_position.y,0.0);
+            }
+            
+        }
+
+
+
 }
