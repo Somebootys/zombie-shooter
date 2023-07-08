@@ -58,6 +58,9 @@ pub struct PlayerAngle(pub f32);
 #[derive(Component)]
 pub struct CrossHair;
 
+#[derive(Component)]
+pub struct PickUp;
+
 #[derive(Resource)]
 pub struct EnemyCount(pub usize);
 
@@ -73,7 +76,7 @@ pub struct GameTextures {
     pub enemy_boomer: Handle<Image>,
     pub enemy_crawler: Handle<Image>,
     pub enemy_zoomer: Handle<Image>,
-    //arena: Handle<TextureAtlas>,
+    pub pickup_health: Handle<Image>,
 }
 
 #[derive(Resource, Debug)]

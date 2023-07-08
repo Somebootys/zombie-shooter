@@ -50,6 +50,7 @@ pub fn setup(
         enemy_boomer: asset_server.load("graphic/boomer.png"),
         enemy_crawler: asset_server.load("graphic/crawler.png"),
         enemy_zoomer: asset_server.load("graphic/zoomer.png"),
+        pickup_health: asset_server.load("graphic/health_pickup.png"),
     };
 
     commands.insert_resource(game_textures);

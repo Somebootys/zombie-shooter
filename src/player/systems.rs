@@ -1,5 +1,6 @@
 use crate::components::{
-    Bullet, ColliderSquare, CrossHair, MainCamera, Movable, Player, PlayerAngle, PLAYER_SPRITE_SIZE,
+    Bullet, ColliderSquare, CrossHair, Health, MainCamera, Movable, Player, PlayerAngle,
+    PLAYER_SPRITE_SIZE,
 };
 use bevy::prelude::*;
 use bevy::window::Window;
@@ -23,6 +24,7 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ..default()
             },
             Player(PLAYER_SPEED),
+            Health { health: 50 },
             RigidBody::Dynamic,
             Velocity {
                 linvel: Vec2::new(0.0, 0.0),
