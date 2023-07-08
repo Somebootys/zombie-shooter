@@ -3,8 +3,8 @@ use crate::components::{DespawnedEnemies, EnemyCount, GameTextures, MainCamera, 
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use std::collections::HashSet;
 use bevy_rapier2d::prelude::*;
+use std::collections::HashSet;
 pub struct SetupPlugin;
 
 impl Plugin for SetupPlugin {
@@ -21,7 +21,6 @@ impl Plugin for SetupPlugin {
 
 pub fn physics_setup(mut rapier_config: ResMut<RapierConfiguration>) {
     rapier_config.gravity = Vec2::new(0.0, 0.0);
- 
 }
 
 pub fn setup(

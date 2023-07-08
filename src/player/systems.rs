@@ -1,10 +1,9 @@
+use crate::components::{
+    Bullet, ColliderSquare, CrossHair, MainCamera, Movable, Player, PlayerAngle, PLAYER_SPRITE_SIZE,
+};
 use bevy::prelude::*;
 use bevy::window::Window;
-use bevy_rapier2d::prelude::*;  
-use crate::components::{
-    Bullet, ColliderSquare, CrossHair, MainCamera, Movable, Player,
-    PLAYER_SPRITE_SIZE,PlayerAngle,
-};
+use bevy_rapier2d::prelude::*;
 //use bevy_rapier2d::prelude::*;
 use libm;
 use std::f32::consts::PI;
@@ -12,33 +11,31 @@ use std::f32::consts::PI;
 const PLAYER_SPEED: f32 = 500.0;
 
 pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
-
     commands.insert_resource(PlayerAngle(0.0));
-    commands.spawn((
-        ColliderSquare {
-            dimension: Vec2::new(PLAYER_SPRITE_SIZE, PLAYER_SPRITE_SIZE),
-        },
-        SpriteBundle {
-            transform: Transform::from_xyz(0.0, 0.0, 0.0),
-            texture: asset_server.load("graphic/player.png"),
-            ..default()
-        },
-        Player(PLAYER_SPEED),
-        RigidBody::Dynamic,
-        Velocity {
-            linvel: Vec2::new(0.0, 0.0),
-            angvel: 0.0,
-        },
-        Collider::cuboid(PLAYER_SPRITE_SIZE/2.0, PLAYER_SPRITE_SIZE/2.0),
-        
-    )).insert(LockedAxes::TRANSLATION_LOCKED);
-    
+    commands
+        .spawn((
+            ColliderSquare {
+                dimension: Vec2::new(PLAYER_SPRITE_SIZE, PLAYER_SPRITE_SIZE),
+            },
+            SpriteBundle {
+                transform: Transform::from_xyz(0.0, 0.0, 0.0),
+                texture: asset_server.load("graphic/player.png"),
+                ..default()
+            },
+            Player(PLAYER_SPEED),
+            RigidBody::Dynamic,
+            Velocity {
+                linvel: Vec2::new(0.0, 0.0),
+                angvel: 0.0,
+            },
+            Collider::cuboid(PLAYER_SPRITE_SIZE / 2.0, PLAYER_SPRITE_SIZE / 2.0),
+        ))
+        .insert(LockedAxes::TRANSLATION_LOCKED);
 }
 
 pub fn player_movement(
-   
     keyboard_input: Res<Input<KeyCode>>,
-    
+
     mut player_info: Query<(&Player, &mut Velocity)>,
 ) {
     for (player, mut rb_vels) in &mut player_info {
@@ -107,7 +104,6 @@ pub fn rotate_player(
     mut windows: Query<&mut Window>,
     // query to get camera transform
     camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-    
 ) {
     // get the camera info and transform
     // assuming there is exactly one main camera entity, so query::single() is OK
@@ -161,13 +157,8 @@ pub fn rotate_player(
                         linvel: diff.normalize(),
                         angvel: angle,
                     },
-                
                 ));
             }
-
-
-
-            
         }
     }
 }

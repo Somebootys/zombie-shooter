@@ -1,15 +1,12 @@
 use bevy::prelude::*;
 use std::collections::HashSet;
 
-
 /// Used to help identify our main camera
 #[derive(Component)]
 pub struct MainCamera;
 
 #[derive(Component)]
 pub struct Player(pub f32); // pub f32 is the speed in pixels per second
-
-
 
 #[derive(Component)]
 pub struct Bullet {

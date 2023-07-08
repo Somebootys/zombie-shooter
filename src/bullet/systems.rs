@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 
 use crate::components::{
-    Bullet, ColliderSquare, Enemy, Movable, BULLET_SPRITE_DIMENSION, BULLETSPEED
+    Bullet, ColliderSquare, Enemy, Movable, BULLETSPEED, BULLET_SPRITE_DIMENSION,
 };
 use bevy::sprite::collide_aabb::collide;
-use std::collections::HashSet;
 use bevy_rapier2d::prelude::*;
+use std::collections::HashSet;
 
 const BULLET_RANGE: f32 = 1000.0;
 

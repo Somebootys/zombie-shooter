@@ -11,7 +11,6 @@ use crate::{
         MAX_NUM_ENEMIES, TYPES_OF_ENEMIES,
     },
     player::systems::player_movement,
-    
 };
 use rand::Rng;
 
@@ -22,13 +21,10 @@ impl Plugin for EnemyPlugin {
         app.add_startup_system(spawn_enemy)
             .add_startup_system(spawn_horde_of_enemies)
             .add_system(update_enemy.after(player_movement))
-            
-            //.add_system(check_collision_between_enemies)
+             //.add_system(check_collision_between_enemies)
             ;
     }
 }
-
-
 
 pub fn spawn_enemy(mut commands: Commands, asset_server: Res<AssetServer>) {
     let off_set = 30.0;
@@ -79,27 +75,32 @@ pub fn spawn_horde_of_enemies(
             ENEMY_ZOOMER_SPRITE_SIZE,
         ];
 
-        commands.spawn((
-            SpriteBundle {
-                transform: Transform::from_xyz(x, y, 10.0),
-                texture: array[enemy_type].clone(),
-                ..default()
-            },
-            Enemy {},
-            RigidBody::Dynamic,
-            Collider::cuboid (
-                array_sprite_size[enemy_type] /2.0_f32  - off_set,
-                array_sprite_size[enemy_type] /2.0_f32 - off_set,
-            ),
-            ColliderSquare {
-                dimension: Vec2::new(
-                    array_sprite_size[enemy_type] / 2.0 - off_set,
-                    array_sprite_size[enemy_type] / 2.0 - off_set,
+        commands
+            .spawn((
+                SpriteBundle {
+                    transform: Transform::from_xyz(x, y, 10.0),
+                    texture: array[enemy_type].clone(),
+                    ..default()
+                },
+                Enemy {},
+                RigidBody::Dynamic,
+                Collider::cuboid(
+                    array_sprite_size[enemy_type] / 2.0_f32 - off_set,
+                    array_sprite_size[enemy_type] / 2.0_f32 - off_set,
                 ),
-            },
-            Alive(true),
-            Health { health: 100 },
-        )).insert(Damping { linear_damping: 15.0, angular_damping: 10.0 });
+                ColliderSquare {
+                    dimension: Vec2::new(
+                        array_sprite_size[enemy_type] / 2.0 - off_set,
+                        array_sprite_size[enemy_type] / 2.0 - off_set,
+                    ),
+                },
+                Alive(true),
+                Health { health: 100 },
+            ))
+            .insert(Damping {
+                linear_damping: 15.0,
+                angular_damping: 10.0,
+            });
         // update enemy count
         enemy_count.0 += 1;
     }
