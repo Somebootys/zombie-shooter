@@ -1,16 +1,27 @@
-use crate::components::{EnemyCount, GameTextures, MainCamera, WinSize};
+use crate::components::{DespawnedEnemies, EnemyCount, GameTextures, MainCamera, WinSize};
+
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
-
+use std::collections::HashSet;
+use bevy_rapier2d::prelude::*;
 pub struct SetupPlugin;
 
 impl Plugin for SetupPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup)
+        app.insert_resource(EnemyCount(0))
+            .add_startup_system(setup.in_base_set(StartupSet::PreStartup))
+            .add_startup_system(physics_setup.in_base_set(StartupSet::PreStartup))
             .add_plugins(DefaultPlugins)
+            .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
+            .add_plugin(RapierDebugRenderPlugin::default())
             .add_plugin(WorldInspectorPlugin::new());
     }
+}
+
+pub fn physics_setup(mut rapier_config: ResMut<RapierConfiguration>) {
+    rapier_config.gravity = Vec2::new(0.0, 0.0);
+ 
 }
 
 pub fn setup(
@@ -43,6 +54,9 @@ pub fn setup(
     };
 
     commands.insert_resource(game_textures);
-    //enemy count resource init
-    commands.insert_resource(EnemyCount(0));
+
+    //despawned enemies resource init
+    commands.insert_resource(DespawnedEnemies {
+        entities: HashSet::new(),
+    });
 }

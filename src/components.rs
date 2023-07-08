@@ -1,16 +1,15 @@
 use bevy::prelude::*;
+use std::collections::HashSet;
+
 
 /// Used to help identify our main camera
 #[derive(Component)]
 pub struct MainCamera;
 
 #[derive(Component)]
-pub struct Player;
+pub struct Player(pub f32); // pub f32 is the speed in pixels per second
 
-#[derive(Component)]
-pub struct Velocity {
-    pub velocity: Vec2,
-}
+
 
 #[derive(Component)]
 pub struct Bullet {
@@ -41,6 +40,9 @@ pub struct TileIndices {
     pub last: usize,
 }
 
+#[derive(Component)]
+pub struct Alive(pub bool);
+
 #[derive(Resource, Debug)]
 pub struct WinSize {
     pub width: f32,
@@ -53,11 +55,19 @@ pub struct ArenaSize {
     pub height: f32,
 }
 
+#[derive(Resource, Debug)]
+pub struct PlayerAngle(pub f32);
+
 #[derive(Component)]
 pub struct CrossHair;
 
 #[derive(Resource)]
 pub struct EnemyCount(pub usize);
+
+#[derive(Resource)]
+pub struct DespawnedEnemies {
+    pub entities: HashSet<Entity>,
+}
 
 #[derive(Resource)]
 pub struct GameTextures {
@@ -69,6 +79,10 @@ pub struct GameTextures {
     //arena: Handle<TextureAtlas>,
 }
 
+#[derive(Resource, Debug)]
+pub struct EnemiesAlive {
+    pub hashset: HashSet<Entity>,
+}
 pub const PLAYER_SPRITE_SIZE: f32 = 50.0;
 pub const ENEMY_BOOMER_SPRITE_SIZE: f32 = 75.0;
 pub const ENEMY_CRAWLER_SPRITE_SIZE: f32 = 75.0;
