@@ -46,7 +46,7 @@ pub fn spawn_enemy(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ENEMY_BOOMER_SPRITE_SIZE / 2.0 - off_set,
             ),
         },
-        Health { health: 100 },
+        Health { hp: 100 },
     ));
 }
 
@@ -95,7 +95,7 @@ pub fn spawn_horde_of_enemies(
                     ),
                 },
                 Alive(true),
-                Health { health: 100 },
+                Health { hp: 100 },
             ))
             .insert(Damping {
                 linear_damping: 15.0,

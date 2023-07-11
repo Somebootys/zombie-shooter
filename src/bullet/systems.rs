@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::components::{
-    Bullet, ColliderSquare, Enemy, Movable, BULLETSPEED, BULLET_SPRITE_DIMENSION,
+    Bullet, ColliderSquare, Enemy, Movable, BULLETSPEED, BULLET_SPRITE_DIMENSION, Health,
 };
 use bevy::sprite::collide_aabb::collide;
 use bevy_rapier2d::prelude::*;
@@ -25,7 +25,7 @@ pub fn update_bullets(
         //update bullet position
         transform.translation.x += velocity.linvel.x * time.delta_seconds() * BULLETSPEED;
         transform.translation.y += velocity.linvel.y * time.delta_seconds() * BULLETSPEED;
-        println!("Bullet position: {:?}", velocity);
+        //println!("Bullet position: {:?}", velocity);
         //despawn bullet if it is out of range
 
         if movable.auto_despawn {
@@ -44,7 +44,7 @@ pub fn update_bullets(
 pub fn bullet_enemy_collision(
     query_bullet: Query<(Entity, &ColliderSquare, &Transform), With<Bullet>>,
     query_enemy: Query<(Entity, &ColliderSquare, &Transform), With<Enemy>>,
-
+    mut enemy: Query<(Entity , &mut Health), With<Enemy>>, 
     mut cmd: Commands,
 ) {
     let mut despawned_entities: HashSet<Entity> = HashSet::new();
@@ -71,9 +71,24 @@ pub fn bullet_enemy_collision(
             if collision.is_some() {
                 // remove the enemy
 
+
                 // remove the laser
                 cmd.entity(bullet_entity).despawn();
                 despawned_entities.insert(bullet_entity);
+
+                // reduce the health of the enemy
+                for (entity, mut health) in enemy.iter_mut() {
+                    if entity == enemy_entity {
+                        health.hp -= 10;
+                        println!("Enemy health: {:?}", health.hp);
+                        if health.hp <= 0 {
+                            cmd.entity(enemy_entity).despawn();
+                            despawned_entities.insert(enemy_entity);
+                        }
+                    }
+                }
+
+              
 
                 break;
             }

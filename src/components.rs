@@ -28,7 +28,7 @@ pub struct ColliderSquare {
 
 #[derive(Component, Debug)]
 pub struct Health {
-    pub health: i32,
+    pub hp: i32,
 }
 
 #[derive(Component, Clone, Copy, Debug)]
@@ -83,6 +83,7 @@ pub struct GameTextures {
 pub struct EnemiesAlive {
     pub hashset: HashSet<Entity>,
 }
+
 pub const PLAYER_SPRITE_SIZE: f32 = 50.0;
 pub const ENEMY_BOOMER_SPRITE_SIZE: f32 = 75.0;
 pub const ENEMY_CRAWLER_SPRITE_SIZE: f32 = 75.0;

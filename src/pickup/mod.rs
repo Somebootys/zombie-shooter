@@ -40,7 +40,7 @@ pub fn pickup_health(
                 .distance(transform_player.translation);
 
             if relative_position < 32.0 {
-                player.health += 10;
+                player.hp += 10;
                 commands.entity(entity).despawn();
             }
         }

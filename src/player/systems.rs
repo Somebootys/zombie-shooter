@@ -1,6 +1,6 @@
 use crate::components::{
     Bullet, ColliderSquare, CrossHair, Health, MainCamera, Movable, Player, PlayerAngle,
-    PLAYER_SPRITE_SIZE,
+    PLAYER_SPRITE_SIZE, Enemy,
 };
 use bevy::prelude::*;
 use bevy::window::Window;
@@ -8,6 +8,7 @@ use bevy_rapier2d::prelude::*;
 //use bevy_rapier2d::prelude::*;
 use libm;
 use std::f32::consts::PI;
+use bevy::sprite::collide_aabb::collide;
 
 const PLAYER_SPEED: f32 = 500.0;
 
@@ -16,7 +17,7 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn((
             ColliderSquare {
-                dimension: Vec2::new(PLAYER_SPRITE_SIZE, PLAYER_SPRITE_SIZE),
+                dimension: Vec2::new(PLAYER_SPRITE_SIZE+5.0, PLAYER_SPRITE_SIZE+5.0),
             },
             SpriteBundle {
                 transform: Transform::from_xyz(0.0, 0.0, 0.0),
@@ -24,7 +25,7 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ..default()
             },
             Player(PLAYER_SPEED),
-            Health { health: 50 },
+            Health { hp: 50 },
             RigidBody::Dynamic,
             Velocity {
                 linvel: Vec2::new(0.0, 0.0),
@@ -163,4 +164,27 @@ pub fn rotate_player(
             }
         }
     }
+}
+
+pub fn player_enemy_collision (   mut player: Query<(Entity, &ColliderSquare, &Transform), With<Player>>,
+query_enemy: Query<( &ColliderSquare, &Transform), With<Enemy>>,
+mut cmd: Commands,
+){
+    for (player_entity, player_collider, player_transform) in &mut player.iter_mut() {
+        for ( enemy_collider, enemy_transform) in &mut query_enemy.iter() {
+
+            let collision = collide(
+                player_transform.translation,
+                player_collider.dimension,
+                enemy_transform.translation,
+                enemy_collider.dimension,
+            );
+
+            if let Some(collision) = collision {
+                println!("Collision detected: {:?}", collision);
+                cmd.entity(player_entity).despawn();
+            }
+        }
+    }
+
 }
