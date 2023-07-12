@@ -56,7 +56,7 @@ pub fn spawn_horde_of_enemies(
     game_textures: Res<GameTextures>,
 ) {
     for _i in 0..MAX_NUM_ENEMIES {
-        let off_set = 0.0;
+        let off_set = 25.0;
         let mut rng = rand::thread_rng();
         let enemy_type = rng.gen_range(0..TYPES_OF_ENEMIES);
         let x = rng.gen_range(-640.0..640.0);
@@ -90,8 +90,8 @@ pub fn spawn_horde_of_enemies(
                 ),
                 ColliderSquare {
                     dimension: Vec2::new(
-                        array_sprite_size[enemy_type] / 2.0 - off_set,
-                        array_sprite_size[enemy_type] / 2.0 - off_set,
+                        array_sprite_size[enemy_type] / 2.0 + off_set,
+                        array_sprite_size[enemy_type] / 2.0 + off_set,
                     ),
                 },
                 Alive(true),

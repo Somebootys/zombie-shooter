@@ -1,4 +1,4 @@
-use crate::components::{DespawnedEnemies, EnemyCount, GameTextures, MainCamera, WinSize};
+use crate::components::{DespawnedEnemies, EnemyCount, GameTextures, MainCamera, WinSize, LastDamaged};
 
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -59,4 +59,11 @@ pub fn setup(
     commands.insert_resource(DespawnedEnemies {
         entities: HashSet::new(),
     });
+
+    //insert player being hit or not
+    
+
+    //insert last damaged time
+    
+    commands.insert_resource(LastDamaged {time: Timer::from_seconds(0.5, TimerMode::Once)})  ;
 }
