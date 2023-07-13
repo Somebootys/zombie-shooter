@@ -63,7 +63,10 @@ pub fn spawn_pickup(mut cmd: Commands, game_textures: ResMut<GameTextures>,
 
 pub fn despawn_pickup(mut cmd: Commands, 
     mut query: Query<(Entity, &mut PickUpDuration), With<PickUp>>, 
-    time: Res<Time>,) {
+    time: Res<Time>,) 
+    {
+
+        // despawn pickups after a certain amount of time
     for (entity, mut pickup_duration) in query.iter_mut() {
         pickup_duration.time.tick(time.delta());
         
