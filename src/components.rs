@@ -1,8 +1,7 @@
 use bevy::prelude::*;
-use std::collections::HashSet;
 use bevy::time::Stopwatch;
+use std::collections::HashSet;
 //------------------------------------------------------------------------Components
-
 
 /// Used to help identify our main camera
 #[derive(Component)]
@@ -52,17 +51,12 @@ pub struct CrossHair;
 #[derive(Component)]
 pub struct PickUp;
 
-
-
 #[derive(Component)]
 pub struct PickUpDuration {
     pub time: Stopwatch,
 }
 
-
-
 // --------------------------------------------------------------------------------Resources
-
 
 #[derive(Resource, Debug)]
 pub struct WinSize {
@@ -78,8 +72,6 @@ pub struct ArenaSize {
 
 #[derive(Resource, Debug)]
 pub struct PlayerAngle(pub f32);
-
-
 
 #[derive(Resource)]
 pub struct EnemyCount(pub usize);
@@ -113,7 +105,6 @@ pub struct LastDamaged {
 pub struct PickUpTimer {
     pub time: Timer,
 }
-
 
 // --------------------------------------------------------------------------------Constants
 

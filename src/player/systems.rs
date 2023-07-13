@@ -1,23 +1,23 @@
 use crate::components::{
-    Bullet, ColliderSquare, CrossHair, Health, MainCamera, Movable, Player,PlayerDamagedTimer,
-    PLAYER_SPRITE_SIZE, Enemy, LastDamaged,
+    Bullet, ColliderSquare, CrossHair, Enemy, Health, LastDamaged, MainCamera, Movable, Player,
+    PlayerDamagedTimer, PLAYER_SPRITE_SIZE,
 };
 use bevy::prelude::*;
 use bevy::window::Window;
 use bevy_rapier2d::prelude::*;
 //use bevy_rapier2d::prelude::*;
+use bevy::sprite::collide_aabb::collide;
 use libm;
 use std::f32::consts::PI;
-use bevy::sprite::collide_aabb::collide;
 //use bevy::utils::Duration;
 
 const PLAYER_SPEED: f32 = 500.0;
 
-pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, ) {
+pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn((
             ColliderSquare {
-                dimension: Vec2::new(PLAYER_SPRITE_SIZE+5.0, PLAYER_SPRITE_SIZE+5.0),
+                dimension: Vec2::new(PLAYER_SPRITE_SIZE + 5.0, PLAYER_SPRITE_SIZE + 5.0),
             },
             SpriteBundle {
                 transform: Transform::from_xyz(0.0, 0.0, 0.0),
@@ -35,7 +35,6 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, ) {
             Collider::cuboid(PLAYER_SPRITE_SIZE / 2.0, PLAYER_SPRITE_SIZE / 2.0),
         ))
         .insert(LockedAxes::TRANSLATION_LOCKED);
-        
 }
 
 pub fn player_movement(
@@ -168,17 +167,15 @@ pub fn rotate_player(
     }
 }
 
-pub fn player_enemy_collision (   mut player: Query<(Entity, &ColliderSquare, &Transform, &mut Health,), With<Player>>,
-query_enemy: Query<( &ColliderSquare, &Transform), With<Enemy>>,
-mut cmd: Commands,
-time: Res<Time>,
-mut player_hit:ResMut<LastDamaged>
-){
-    for (player_entity, player_collider, player_transform, mut player,) in &mut player.iter_mut() {
-        for ( enemy_collider, enemy_transform) in &mut query_enemy.iter() {
-
-             
-
+pub fn player_enemy_collision(
+    mut player: Query<(Entity, &ColliderSquare, &Transform, &mut Health), With<Player>>,
+    query_enemy: Query<(&ColliderSquare, &Transform), With<Enemy>>,
+    mut cmd: Commands,
+    time: Res<Time>,
+    mut player_hit: ResMut<LastDamaged>,
+) {
+    for (player_entity, player_collider, player_transform, mut player) in &mut player.iter_mut() {
+        for (enemy_collider, enemy_transform) in &mut query_enemy.iter() {
             let collision = collide(
                 player_transform.translation,
                 player_collider.dimension,
@@ -187,33 +184,18 @@ mut player_hit:ResMut<LastDamaged>
             );
 
             if let Some(_collision) = collision {
-                
-
                 if player_hit.time.tick(time.delta()).just_finished() {
-                // damage the player
-                println!("player hit " );
-                player.hp -= 10;
+                    // damage the player
+                    println!("player hit ");
+                    player.hp -= 10;
 
-                if player.hp <= 0 {
-                    cmd.entity(player_entity).despawn();
+                    if player.hp <= 0 {
+                        cmd.entity(player_entity).despawn();
+                    }
+
+                    player_hit.time.reset();
                 }
-                
-                player_hit.time.reset();
-
-                }
-
-
-
-    
-
-                
-                    
-            }
-                
-                
             }
         }
-        }
-
-
-
+    }
+}

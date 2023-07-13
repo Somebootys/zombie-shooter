@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::components::{
-    Bullet, ColliderSquare, Enemy, Movable, BULLETSPEED, BULLET_SPRITE_DIMENSION, Health,
+    Bullet, ColliderSquare, Enemy, Health, Movable, BULLETSPEED, BULLET_SPRITE_DIMENSION,
 };
 use bevy::sprite::collide_aabb::collide;
 use bevy_rapier2d::prelude::*;
@@ -44,7 +44,7 @@ pub fn update_bullets(
 pub fn bullet_enemy_collision(
     query_bullet: Query<(Entity, &ColliderSquare, &Transform), With<Bullet>>,
     query_enemy: Query<(Entity, &ColliderSquare, &Transform), With<Enemy>>,
-    mut enemy: Query<(Entity , &mut Health), With<Enemy>>, 
+    mut enemy: Query<(Entity, &mut Health), With<Enemy>>,
     mut cmd: Commands,
 ) {
     let mut despawned_entities: HashSet<Entity> = HashSet::new();
@@ -71,7 +71,6 @@ pub fn bullet_enemy_collision(
             if collision.is_some() {
                 // remove the enemy
 
-
                 // remove the laser
                 cmd.entity(bullet_entity).despawn();
                 despawned_entities.insert(bullet_entity);
@@ -87,8 +86,6 @@ pub fn bullet_enemy_collision(
                         }
                     }
                 }
-
-              
 
                 break;
             }

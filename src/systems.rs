@@ -1,4 +1,6 @@
-use crate::components::{DespawnedEnemies, EnemyCount, GameTextures, MainCamera, WinSize, LastDamaged, PickUpTimer};
+use crate::components::{
+    DespawnedEnemies, EnemyCount, GameTextures, LastDamaged, MainCamera, PickUpTimer, WinSize,
+};
 
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -61,12 +63,15 @@ pub fn setup(
     });
 
     //insert player being hit or not
-    
 
     //insert last damaged time
-    
-    commands.insert_resource(LastDamaged {time: Timer::from_seconds(0.5, TimerMode::Once)})  ;
+
+    commands.insert_resource(LastDamaged {
+        time: Timer::from_seconds(0.5, TimerMode::Once),
+    });
 
     //insert pick up timer
-    commands.insert_resource(PickUpTimer {time: Timer::from_seconds(5.0, TimerMode::Once)})  ;
+    commands.insert_resource(PickUpTimer {
+        time: Timer::from_seconds(5.0, TimerMode::Once),
+    });
 }
