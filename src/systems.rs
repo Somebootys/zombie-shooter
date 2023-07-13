@@ -1,4 +1,4 @@
-use crate::components::{DespawnedEnemies, EnemyCount, GameTextures, MainCamera, WinSize, LastDamaged};
+use crate::components::{DespawnedEnemies, EnemyCount, GameTextures, MainCamera, WinSize, LastDamaged, PickUpTimer};
 
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -66,4 +66,7 @@ pub fn setup(
     //insert last damaged time
     
     commands.insert_resource(LastDamaged {time: Timer::from_seconds(0.5, TimerMode::Once)})  ;
+
+    //insert pick up timer
+    commands.insert_resource(PickUpTimer {time: Timer::from_seconds(5.0, TimerMode::Once)})  ;
 }
