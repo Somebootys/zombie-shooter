@@ -2,9 +2,6 @@ use bevy::prelude::*;
 use bevy::time::Stopwatch;
 use std::collections::HashSet;
 
-
-
-
 // --------------------------------------------------------------------------------Constants
 
 pub const PLAYER_SPRITE_SIZE: f32 = 50.0;
@@ -16,7 +13,6 @@ pub const BULLET_SPRITE_DIMENSION: Vec2 = Vec2::new(90.0, 54.0);
 pub const MAX_NUM_ENEMIES: usize = 10;
 pub const TYPES_OF_ENEMIES: usize = 3;
 pub const PICK_UP_DURATION: u64 = 5;
-
 
 //---------------------------------------------------------------------------------Components
 
@@ -68,20 +64,16 @@ pub struct CrossHair;
 #[derive(Component)]
 pub struct PickUp;
 
-
-
-
-
 #[derive(Component)]
 pub struct GunType {
     pub gun_type: usize,
-}    
+}
 
 impl GunType {
     pub fn gun_type(&self) -> usize {
         self.gun_type
     }
-   
+
     pub fn magasine_size(&self) -> usize {
         match self.gun_type {
             0 => 8,
@@ -99,7 +91,7 @@ impl GunType {
         }
     }
 
-    pub fn gun_damage (&self) -> f32 {
+    pub fn gun_damage(&self) -> f32 {
         match self.gun_type {
             0 => 10.0,
             1 => 20.0,
@@ -108,8 +100,6 @@ impl GunType {
         }
     }
 }
-
-
 
 #[derive(Component)]
 pub struct PickUpDuration {
@@ -179,4 +169,3 @@ pub struct EquippedGun {
     pub bullets: usize,
     pub bullets_in_magasine: usize,
 }
-

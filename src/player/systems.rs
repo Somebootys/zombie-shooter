@@ -1,6 +1,6 @@
 use crate::components::{
-    Bullet, ColliderSquare, CrossHair, Enemy, Health, LastDamaged, MainCamera, Movable, Player,
-    PlayerDamagedTimer, PLAYER_SPRITE_SIZE,EquippedGun,
+    Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, Health, LastDamaged, MainCamera,
+    Movable, Player, PlayerDamagedTimer, PLAYER_SPRITE_SIZE,
 };
 use bevy::prelude::*;
 use bevy::window::Window;
@@ -166,14 +166,12 @@ pub fn rotate_player(
                 ));
                 if eq_gun.bullets_in_magasine == 0 {
                     println!("Out of bullets!!");
-                }
-                else {
-                    
+                } else {
                     eq_gun.bullets_in_magasine -= 1;
+                }
             }
         }
     }
-}
 }
 
 pub fn player_enemy_collision(
@@ -209,33 +207,18 @@ pub fn player_enemy_collision(
     }
 }
 
-pub fn reload_gun(mut eq_gun: ResMut<EquippedGun>, time: Res<Time>,
-    kb_input: Res<Input<KeyCode>>) {
-
-
-        
-
-        if kb_input.just_released(KeyCode::R) {
-            if eq_gun.bullets <= 0 {
-                println!("Bullets: {:?}", eq_gun.bullets);
-                println!("Out of bullets!!");
-                
-            }
-            else if eq_gun.bullets_in_magasine < 8 {
-                println!("Reloading...");
-                println!("Bullets: {:?}", eq_gun.bullets);
-                eq_gun.bullets -= 8 - eq_gun.bullets_in_magasine;
-                eq_gun.bullets_in_magasine = 8;
-            }
-            else {
-                println!("Magasine is full");
-                
-            }
+pub fn reload_gun(mut eq_gun: ResMut<EquippedGun>, time: Res<Time>, kb_input: Res<Input<KeyCode>>) {
+    if kb_input.just_released(KeyCode::R) {
+        if eq_gun.bullets <= 0 {
+            println!("Bullets: {:?}", eq_gun.bullets);
+            println!("Out of bullets!!");
+        } else if eq_gun.bullets_in_magasine < 8 {
+            println!("Reloading...");
+            println!("Bullets: {:?}", eq_gun.bullets);
+            eq_gun.bullets -= 8 - eq_gun.bullets_in_magasine;
+            eq_gun.bullets_in_magasine = 8;
+        } else {
+            println!("Magasine is full");
         }
-   
-    
+    }
 }
-
-
-
-
