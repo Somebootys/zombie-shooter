@@ -1,5 +1,5 @@
 use crate::components::{
-    DespawnedEnemies, EnemyCount, GameTextures, LastDamaged, MainCamera, PickUpTimer, WinSize,
+    DespawnedEnemies, EnemyCount, GameTextures, LastDamaged, MainCamera, PickUpTimer, WinSize, EquippedGun, GunType, Guns,
 };
 
 use bevy::prelude::*;
@@ -73,5 +73,12 @@ pub fn setup(
     //insert pick up timer
     commands.insert_resource(PickUpTimer {
         time: Timer::from_seconds(5.0, TimerMode::Once),
+    });
+
+    //insert equipped gun
+    commands.insert_resource(EquippedGun {
+        gun_type: Guns::Pistol as usize,
+        bullets:  8, 
+        bullets_in_magasine: 8, 
     });
 }

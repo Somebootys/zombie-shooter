@@ -15,6 +15,7 @@ impl Plugin for PlayerPlugin {
             .add_system(player_movement)
             .add_system(update_crosshair)
             .add_system(rotate_player)
-            .add_system(player_enemy_collision);
+            .add_system(player_enemy_collision)
+            .add_system(reload_gun);
     }
 }

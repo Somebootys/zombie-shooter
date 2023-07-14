@@ -1,7 +1,24 @@
 use bevy::prelude::*;
 use bevy::time::Stopwatch;
 use std::collections::HashSet;
-//------------------------------------------------------------------------Components
+
+
+
+
+// --------------------------------------------------------------------------------Constants
+
+pub const PLAYER_SPRITE_SIZE: f32 = 50.0;
+pub const ENEMY_BOOMER_SPRITE_SIZE: f32 = 75.0;
+pub const ENEMY_CRAWLER_SPRITE_SIZE: f32 = 75.0;
+pub const ENEMY_ZOOMER_SPRITE_SIZE: f32 = 75.0;
+pub const BULLETSPEED: f32 = 1000.0;
+pub const BULLET_SPRITE_DIMENSION: Vec2 = Vec2::new(90.0, 54.0);
+pub const MAX_NUM_ENEMIES: usize = 10;
+pub const TYPES_OF_ENEMIES: usize = 3;
+pub const PICK_UP_DURATION: u64 = 5;
+
+
+//---------------------------------------------------------------------------------Components
 
 /// Used to help identify our main camera
 #[derive(Component)]
@@ -51,9 +68,59 @@ pub struct CrossHair;
 #[derive(Component)]
 pub struct PickUp;
 
+
+
+
+
+#[derive(Component)]
+pub struct GunType {
+    pub gun_type: usize,
+}    
+
+impl GunType {
+    pub fn gun_type(&self) -> usize {
+        self.gun_type
+    }
+   
+    pub fn magasine_size(&self) -> usize {
+        match self.gun_type {
+            0 => 8,
+            1 => 3,
+            2 => 5,
+            _ => 0,
+        }
+    }
+    pub fn reload_time(&self) -> f32 {
+        match self.gun_type {
+            0 => 1.0,
+            1 => 2.0,
+            2 => 3.0,
+            _ => 0.0,
+        }
+    }
+
+    pub fn gun_damage (&self) -> f32 {
+        match self.gun_type {
+            0 => 10.0,
+            1 => 20.0,
+            2 => 30.0,
+            _ => 0.0,
+        }
+    }
+}
+
+
+
 #[derive(Component)]
 pub struct PickUpDuration {
     pub time: Stopwatch,
+}
+
+// --------------------------------------------------------------------------------ENUMS
+pub enum Guns {
+    Pistol,
+    Shotgun,
+    MachineGun,
 }
 
 // --------------------------------------------------------------------------------Resources
@@ -106,14 +173,10 @@ pub struct PickUpTimer {
     pub time: Timer,
 }
 
-// --------------------------------------------------------------------------------Constants
+#[derive(Resource, Debug)]
+pub struct EquippedGun {
+    pub gun_type: usize,
+    pub bullets: usize,
+    pub bullets_in_magasine: usize,
+}
 
-pub const PLAYER_SPRITE_SIZE: f32 = 50.0;
-pub const ENEMY_BOOMER_SPRITE_SIZE: f32 = 75.0;
-pub const ENEMY_CRAWLER_SPRITE_SIZE: f32 = 75.0;
-pub const ENEMY_ZOOMER_SPRITE_SIZE: f32 = 75.0;
-pub const BULLETSPEED: f32 = 1000.0;
-pub const BULLET_SPRITE_DIMENSION: Vec2 = Vec2::new(90.0, 54.0);
-pub const MAX_NUM_ENEMIES: usize = 10;
-pub const TYPES_OF_ENEMIES: usize = 3;
-pub const PICK_UP_DURATION: u64 = 5;
