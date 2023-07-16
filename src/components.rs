@@ -64,39 +64,36 @@ pub struct CrossHair;
 #[derive(Component)]
 pub struct PickUp;
 
-#[derive(Component)]
+#[derive(Component, Clone, Debug)]
 pub struct GunType {
-    pub gun_type: usize,
+    pub gun_type: Guns,
 }
 
 impl GunType {
-    pub fn gun_type(&self) -> usize {
-        self.gun_type
+    pub fn gun_type(&self) -> &Guns {
+        return &self.gun_type;
     }
 
     pub fn magasine_size(&self) -> usize {
         match self.gun_type {
-            0 => 8,
-            1 => 3,
-            2 => 5,
-            _ => 0,
+            Guns::Pistol => 8,
+            Guns::Shotgun => 3,
+            Guns::MachineGun => 30,
         }
     }
     pub fn reload_time(&self) -> f32 {
         match self.gun_type {
-            0 => 1.0,
-            1 => 2.0,
-            2 => 3.0,
-            _ => 0.0,
+            Guns::Pistol => 0.5,
+            Guns::Shotgun => 2.0,
+            Guns::MachineGun => 0.5,
         }
     }
 
-    pub fn gun_damage(&self) -> f32 {
+    pub fn gun_damage(&self) -> i32 {
         match self.gun_type {
-            0 => 10.0,
-            1 => 20.0,
-            2 => 30.0,
-            _ => 0.0,
+            Guns::Pistol => 10,
+            Guns::Shotgun => 30,
+            Guns::MachineGun => 10,
         }
     }
 }
@@ -107,6 +104,7 @@ pub struct PickUpDuration {
 }
 
 // --------------------------------------------------------------------------------ENUMS
+#[derive(Debug, Clone)]
 pub enum Guns {
     Pistol,
     Shotgun,
@@ -163,9 +161,9 @@ pub struct PickUpTimer {
     pub time: Timer,
 }
 
-#[derive(Resource, Debug)]
+#[derive(Resource, Debug, Clone)]
 pub struct EquippedGun {
-    pub gun_type: usize,
+    pub gun_type: Guns,
     pub bullets: usize,
     pub bullets_in_magasine: usize,
 }

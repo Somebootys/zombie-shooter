@@ -1,6 +1,6 @@
 use crate::components::{
-    Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, Health, LastDamaged, MainCamera,
-    Movable, Player, PlayerDamagedTimer, PLAYER_SPRITE_SIZE,
+    Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, GunType, Health, LastDamaged,
+    MainCamera, Movable, Player, PlayerDamagedTimer, PLAYER_SPRITE_SIZE,
 };
 use bevy::prelude::*;
 use bevy::window::Window;
@@ -207,16 +207,23 @@ pub fn player_enemy_collision(
     }
 }
 
-pub fn reload_gun(mut eq_gun: ResMut<EquippedGun>, time: Res<Time>, kb_input: Res<Input<KeyCode>>) {
+pub fn reload_gun(
+    mut eq_gun: ResMut<EquippedGun>,
+    _time: Res<Time>,
+    kb_input: Res<Input<KeyCode>>,
+) {
+    let gun = GunType {
+        gun_type: eq_gun.gun_type.clone(),
+    };
     if kb_input.just_released(KeyCode::R) {
         if eq_gun.bullets <= 0 {
             println!("Bullets: {:?}", eq_gun.bullets);
             println!("Out of bullets!!");
-        } else if eq_gun.bullets_in_magasine < 8 {
+        } else if eq_gun.bullets_in_magasine < gun.magasine_size() {
             println!("Reloading...");
             println!("Bullets: {:?}", eq_gun.bullets);
-            eq_gun.bullets -= 8 - eq_gun.bullets_in_magasine;
-            eq_gun.bullets_in_magasine = 8;
+            eq_gun.bullets -= gun.magasine_size() - eq_gun.bullets_in_magasine;
+            eq_gun.bullets_in_magasine = gun.magasine_size();
         } else {
             println!("Magasine is full");
         }

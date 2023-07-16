@@ -1,6 +1,6 @@
 use crate::components::{
-    DespawnedEnemies, EnemyCount, EquippedGun, GameTextures, GunType, Guns, LastDamaged,
-    MainCamera, PickUpTimer, WinSize,
+    DespawnedEnemies, EnemyCount, EquippedGun, GameTextures, Guns, LastDamaged, MainCamera,
+    PickUpTimer, WinSize,
 };
 
 use bevy::prelude::*;
@@ -78,7 +78,7 @@ pub fn setup(
 
     //insert equipped gun
     commands.insert_resource(EquippedGun {
-        gun_type: Guns::Pistol as usize,
+        gun_type: Guns::Pistol,
         bullets: 8,
         bullets_in_magasine: 8,
     });

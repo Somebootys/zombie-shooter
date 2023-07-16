@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "zombie-game-e9da5"
+  },
+  "targets": {
+    "zombie-game-e9da5": {
+      "hosting": {
+        "web": [
+          "zombie-game-e9da5"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

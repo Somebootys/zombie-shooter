@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 
 use crate::components::{
-    Bullet, ColliderSquare, Enemy, GunType, Guns, Health, Movable, BULLETSPEED,
-    BULLET_SPRITE_DIMENSION,
+    Bullet, ColliderSquare, Enemy, Health, Movable, BULLETSPEED, BULLET_SPRITE_DIMENSION,
 };
 use bevy::sprite::collide_aabb::collide;
 use bevy_rapier2d::prelude::*;
