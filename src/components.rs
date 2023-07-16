@@ -8,6 +8,7 @@ pub const PLAYER_SPRITE_SIZE: f32 = 50.0;
 pub const ENEMY_BOOMER_SPRITE_SIZE: f32 = 75.0;
 pub const ENEMY_CRAWLER_SPRITE_SIZE: f32 = 75.0;
 pub const ENEMY_ZOOMER_SPRITE_SIZE: f32 = 75.0;
+pub const PICKUP_SPRITE_SIZE: f32 = 64.0;
 pub const BULLETSPEED: f32 = 1000.0;
 pub const BULLET_SPRITE_DIMENSION: Vec2 = Vec2::new(90.0, 54.0);
 pub const MAX_NUM_ENEMIES: usize = 10;
@@ -62,7 +63,13 @@ pub struct Alive(pub bool);
 pub struct CrossHair;
 
 #[derive(Component)]
-pub struct PickUp;
+pub struct PickUp{
+    pub health: bool,
+    pub ammo: bool,
+}
+
+#[derive(Component, Debug)]
+pub struct Ammo{pub vec: [i32; 3]}
 
 #[derive(Component, Clone, Debug)]
 pub struct GunType {
@@ -144,6 +151,7 @@ pub struct GameTextures {
     pub enemy_crawler: Handle<Image>,
     pub enemy_zoomer: Handle<Image>,
     pub pickup_health: Handle<Image>,
+    pub pickup_ammo: Handle<Image>,
 }
 
 #[derive(Resource, Debug)]
@@ -164,6 +172,5 @@ pub struct PickUpTimer {
 #[derive(Resource, Debug, Clone)]
 pub struct EquippedGun {
     pub gun_type: Guns,
-    pub bullets: usize,
     pub bullets_in_magasine: usize,
 }

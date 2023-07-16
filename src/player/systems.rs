@@ -1,5 +1,5 @@
 use crate::components::{
-    Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, GunType, Health, LastDamaged,
+    Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, GunType, Health, LastDamaged, Ammo,
     MainCamera, Movable, Player, PlayerDamagedTimer, PLAYER_SPRITE_SIZE,
 };
 use bevy::prelude::*;
@@ -27,6 +27,9 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
             Player(PLAYER_SPEED),
             PlayerDamagedTimer(Timer::from_seconds(10.0, TimerMode::Once)),
             Health { hp: 50 },
+            Ammo {
+                vec: [8, 0, 0],
+            },
             RigidBody::Dynamic,
             Velocity {
                 linvel: Vec2::new(0.0, 0.0),
@@ -197,7 +200,7 @@ pub fn player_enemy_collision(
                     player.hp -= 10;
 
                     if player.hp <= 0 {
-                        cmd.entity(player_entity).despawn();
+                        cmd.entity(player_entity).despawn_recursive();
                     }
 
                     player_hit.time.reset();
@@ -208,6 +211,7 @@ pub fn player_enemy_collision(
 }
 
 pub fn reload_gun(
+    mut player_query: Query<&mut Ammo, With<Player>>,
     mut eq_gun: ResMut<EquippedGun>,
     _time: Res<Time>,
     kb_input: Res<Input<KeyCode>>,
@@ -215,17 +219,28 @@ pub fn reload_gun(
     let gun = GunType {
         gun_type: eq_gun.gun_type.clone(),
     };
-    if kb_input.just_released(KeyCode::R) {
-        if eq_gun.bullets <= 0 {
-            println!("Bullets: {:?}", eq_gun.bullets);
-            println!("Out of bullets!!");
-        } else if eq_gun.bullets_in_magasine < gun.magasine_size() {
-            println!("Reloading...");
-            println!("Bullets: {:?}", eq_gun.bullets);
-            eq_gun.bullets -= gun.magasine_size() - eq_gun.bullets_in_magasine;
-            eq_gun.bullets_in_magasine = gun.magasine_size();
-        } else {
-            println!("Magasine is full");
+
+    //handle crash if ammo vector does not exist cannot use unwrap
+    if let Ok(mut player_ammo) = player_query.get_single_mut() {
+        let total_bullet = player_ammo.vec[gun.gun_type().clone() as usize].clone();
+
+
+        if kb_input.just_released(KeyCode::R) {
+            if player_ammo.vec[gun.gun_type.clone() as usize] <= 0 {
+                println!("Out of bullets!!");
+            } else if eq_gun.bullets_in_magasine < gun.magasine_size().clone() {
+                println!("Reloading...");
+                player_ammo.vec[0] -= (gun.magasine_size() - eq_gun.bullets_in_magasine) as i32;
+                eq_gun.bullets_in_magasine = gun.magasine_size();
+            } else {
+                println!("Magasine is full");
+            }
         }
     }
+    
+    
+    
+
+    //TODO fix the zero in 233 also need to add reload time
+
 }

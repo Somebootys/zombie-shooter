@@ -1,6 +1,6 @@
 use crate::components::{
     DespawnedEnemies, EnemyCount, EquippedGun, GameTextures, Guns, LastDamaged, MainCamera,
-    PickUpTimer, WinSize,
+    PickUpTimer, WinSize, Player,
 };
 
 use bevy::prelude::*;
@@ -18,7 +18,8 @@ impl Plugin for SetupPlugin {
             .add_plugins(DefaultPlugins)
             .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
             .add_plugin(RapierDebugRenderPlugin::default())
-            .add_plugin(WorldInspectorPlugin::new());
+            .add_plugin(WorldInspectorPlugin::new())
+            .add_system(camera_movement.in_base_set(StartupSet::PostStartup));
     }
 }
 
@@ -54,6 +55,7 @@ pub fn setup(
         enemy_crawler: asset_server.load("graphic/crawler.png"),
         enemy_zoomer: asset_server.load("graphic/zoomer.png"),
         pickup_health: asset_server.load("graphic/health_pickup.png"),
+        pickup_ammo: asset_server.load("graphic/ammo_pickup.png"),
     };
 
     commands.insert_resource(game_textures);
@@ -76,10 +78,30 @@ pub fn setup(
         time: Timer::from_seconds(5.0, TimerMode::Once),
     });
 
-    //insert equipped gun
-    commands.insert_resource(EquippedGun {
+
+    let gun = EquippedGun {
         gun_type: Guns::Pistol,
-        bullets: 8,
         bullets_in_magasine: 8,
-    });
+    };
+    //insert equipped gun
+    commands.insert_resource(gun);
+}
+
+pub fn camera_movement(
+    player: Query<&mut Transform, (With<Player>, Without<MainCamera>)>,
+     mut camera: Query<&mut Transform, With<MainCamera>>,
+     time : Res<Time>,
+    //mut windows: Query<&mut Window>,
+)
+{
+    //move camera with the player
+
+     
+    for player_transform in player.iter() {
+        for mut camera_transform in camera.iter_mut() {
+            camera_transform.translation.x = player_transform.translation.x * 0.5;
+            camera_transform.translation.y = player_transform.translation.y * 0.5;
+        }
+    }
+
 }
