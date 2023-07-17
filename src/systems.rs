@@ -1,9 +1,10 @@
 use crate::components::{
     DespawnedEnemies, EnemyCount, EquippedGun, GameTextures, Guns, LastDamaged, MainCamera,
-    PickUpTimer, WinSize, Player,
+    PickUpTimer, Player, ReloadTimer, WinSize,
 };
 
 use bevy::prelude::*;
+use bevy::time::Stopwatch;
 use bevy::window::PrimaryWindow;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier2d::prelude::*;
@@ -78,30 +79,32 @@ pub fn setup(
         time: Timer::from_seconds(5.0, TimerMode::Once),
     });
 
-
     let gun = EquippedGun {
         gun_type: Guns::Pistol,
         bullets_in_magasine: 8,
     };
     //insert equipped gun
     commands.insert_resource(gun);
+
+    let reload_timer = ReloadTimer {
+        time: Stopwatch::new(),
+    };
+
+    //insert reload timer resource
+    commands.insert_resource(reload_timer);
 }
 
 pub fn camera_movement(
     player: Query<&mut Transform, (With<Player>, Without<MainCamera>)>,
-     mut camera: Query<&mut Transform, With<MainCamera>>,
-     time : Res<Time>,
+    mut camera: Query<&mut Transform, With<MainCamera>>,
     //mut windows: Query<&mut Window>,
-)
-{
+) {
     //move camera with the player
 
-     
     for player_transform in player.iter() {
         for mut camera_transform in camera.iter_mut() {
-            camera_transform.translation.x = player_transform.translation.x * 0.5;
-            camera_transform.translation.y = player_transform.translation.y * 0.5;
+            camera_transform.translation.x = player_transform.translation.x;
+            camera_transform.translation.y = player_transform.translation.y;
         }
     }
-
 }

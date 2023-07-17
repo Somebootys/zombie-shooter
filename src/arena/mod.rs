@@ -1,10 +1,7 @@
+use crate::components::{ArenaSize, TileIndices, TILE_SIZE, TILE_TYPES};
 use bevy::prelude::*;
-
-use crate::components::{ArenaSize, TileIndices};
+use bevy_rapier2d::prelude::*;
 use rand::Rng;
-pub const TILE_SIZE: f32 = 50_f32;
-pub const TILE_TYPES: usize = 3;
-pub const VERTS_IN_QUAD: i8 = 4;
 
 pub struct ArenaPlugin;
 
@@ -20,54 +17,66 @@ pub fn setup(
 
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
+    //TODO: something makes the game run slow and also choppy if arena size is bigger than 1000x1000. Should look into how to pass by reference instead of value.
+
     // width and height of the arena
     let arena_size = ArenaSize {
-        width: 500.0,
-        height: 500.0,
+        width: 1000.0,
+        height: 1000.0,
     };
 
     let world_width = (arena_size.width as i32) / (TILE_SIZE as i32);
     let world_height = (arena_size.width as i32) / (TILE_SIZE as i32);
+    let tmp_arena_size = arena_size.clone();
     commands.insert_resource(arena_size);
+
+    //the below code was inside the nested loop, made it slow as hell. Moved it outside and it runs fine now.
+
+    let texture_handle = asset_server.load("graphic/background_sheet.png");
+    let texture_atlas = TextureAtlas::from_grid(
+        texture_handle,
+        Vec2::new(TILE_SIZE, TILE_SIZE),
+        1,
+        4,
+        None,
+        None,
+    );
+
+    let texture_atlas_handle = texture_atlases.add(texture_atlas);
+
+    let tile_indices = TileIndices {
+        first: 0,
+        last: TILE_TYPES,
+    };
+    let z = 0.0_f32;
 
     for w in 0..world_width {
         for h in 0..(world_height) {
-            let texture_handle = asset_server.load("graphic/background_sheet.png");
-            let texture_atlas = TextureAtlas::from_grid(
-                texture_handle,
-                Vec2::new(TILE_SIZE, TILE_SIZE),
-                1,
-                4,
-                None,
-                None,
-            );
-            let texture_atlas_handle = texture_atlases.add(texture_atlas);
-            let tile_indices = TileIndices {
-                first: 0,
-                last: TILE_TYPES,
-            };
-            let x = -250 as f32 + w as f32 * TILE_SIZE;
-            let y = -250 as f32 + h as f32 * TILE_SIZE;
-            let z = 0.0;
+            let x = (-tmp_arena_size.width / 2.0 as f32) + w as f32 * TILE_SIZE;
+            let y = (-tmp_arena_size.height / 2.0 as f32) + h as f32 * TILE_SIZE;
 
             // if outer edge then spawn wall
             if h == 0 || h == world_height - 1 || w == 0 || w == world_width - 1 {
                 // Use the wall texture
-                commands.spawn((
-                    SpriteSheetBundle {
-                        texture_atlas: texture_atlas_handle,
-                        sprite: TextureAtlasSprite::new(tile_indices.last),
-                        transform: Transform {
-                            translation: Vec3::new(x, y, z),
+                commands
+                    .spawn((
+                        SpriteSheetBundle {
+                            texture_atlas: texture_atlas_handle.clone(),
+                            sprite: TextureAtlasSprite::new(tile_indices.last),
+                            transform: Transform {
+                                translation: Vec3::new(x, y, z),
 
-                            rotation: Quat::IDENTITY,
+                                rotation: Quat::IDENTITY,
 
-                            scale: Vec3::splat(1.0),
+                                scale: Vec3::splat(1.0),
+                            },
+                            ..default()
                         },
-                        ..default()
-                    },
-                    tile_indices,
-                ));
+                        tile_indices,
+                        RigidBody::Fixed,
+                        Collider::cuboid(TILE_SIZE / 2.0, TILE_SIZE / 2.0),
+                    ))
+                    .insert(ActiveCollisionTypes::default() | ActiveCollisionTypes::DYNAMIC_STATIC);
             }
             // spawn the normal floor tiles
             else {

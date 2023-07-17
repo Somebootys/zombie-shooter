@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::time::Stopwatch;
 use std::collections::HashSet;
+use std::time::Duration;
 
 // --------------------------------------------------------------------------------Constants
 
@@ -14,6 +15,10 @@ pub const BULLET_SPRITE_DIMENSION: Vec2 = Vec2::new(90.0, 54.0);
 pub const MAX_NUM_ENEMIES: usize = 10;
 pub const TYPES_OF_ENEMIES: usize = 3;
 pub const PICK_UP_DURATION: u64 = 5;
+pub const TILE_SIZE: f32 = 50_f32;
+pub const TILE_TYPES: usize = 3;
+pub const VERTS_IN_QUAD: i8 = 4;
+pub const ARENA_SIZE: f32 = 1000.0;
 
 //---------------------------------------------------------------------------------Components
 
@@ -63,13 +68,15 @@ pub struct Alive(pub bool);
 pub struct CrossHair;
 
 #[derive(Component)]
-pub struct PickUp{
+pub struct PickUp {
     pub health: bool,
     pub ammo: bool,
 }
 
 #[derive(Component, Debug)]
-pub struct Ammo{pub vec: [i32; 3]}
+pub struct Ammo {
+    pub vec: [i32; 3],
+}
 
 #[derive(Component, Clone, Debug)]
 pub struct GunType {
@@ -88,11 +95,11 @@ impl GunType {
             Guns::MachineGun => 30,
         }
     }
-    pub fn reload_time(&self) -> f32 {
+    pub fn reload_time(&self) -> Duration {
         match self.gun_type {
-            Guns::Pistol => 0.5,
-            Guns::Shotgun => 2.0,
-            Guns::MachineGun => 0.5,
+            Guns::Pistol => Duration::from_secs_f32(1.5),
+            Guns::Shotgun => Duration::from_secs_f32(2.5),
+            Guns::MachineGun => Duration::from_secs_f32(1.0),
         }
     }
 
@@ -110,6 +117,10 @@ pub struct PickUpDuration {
     pub time: Stopwatch,
 }
 
+#[derive(Resource, Debug)]
+pub struct ReloadTimer {
+    pub time: Stopwatch,
+}
 // --------------------------------------------------------------------------------ENUMS
 #[derive(Debug, Clone)]
 pub enum Guns {
@@ -126,7 +137,7 @@ pub struct WinSize {
     pub height: f32,
 }
 
-#[derive(Resource, Debug)]
+#[derive(Resource, Debug, Clone)]
 pub struct ArenaSize {
     pub width: f32,
     pub height: f32,

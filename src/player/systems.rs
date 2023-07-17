@@ -1,6 +1,6 @@
 use crate::components::{
-    Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, GunType, Health, LastDamaged, Ammo,
-    MainCamera, Movable, Player, PlayerDamagedTimer, PLAYER_SPRITE_SIZE,
+    Ammo, Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, GunType, Health, LastDamaged,
+    MainCamera, Movable, Player, PlayerDamagedTimer, ReloadTimer, PLAYER_SPRITE_SIZE,
 };
 use bevy::prelude::*;
 use bevy::window::Window;
@@ -9,6 +9,7 @@ use bevy_rapier2d::prelude::*;
 use bevy::sprite::collide_aabb::collide;
 use libm;
 use std::f32::consts::PI;
+use std::time::Duration;
 //use bevy::utils::Duration;
 
 const PLAYER_SPEED: f32 = 500.0;
@@ -27,9 +28,7 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
             Player(PLAYER_SPEED),
             PlayerDamagedTimer(Timer::from_seconds(10.0, TimerMode::Once)),
             Health { hp: 50 },
-            Ammo {
-                vec: [8, 0, 0],
-            },
+            Ammo { vec: [8, 0, 0] },
             RigidBody::Dynamic,
             Velocity {
                 linvel: Vec2::new(0.0, 0.0),
@@ -37,7 +36,12 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
             },
             Collider::cuboid(PLAYER_SPRITE_SIZE / 2.0, PLAYER_SPRITE_SIZE / 2.0),
         ))
-        .insert(LockedAxes::TRANSLATION_LOCKED);
+        //.insert(LockedAxes::TRANSLATION_LOCKED)
+        .insert(ActiveCollisionTypes::default() | ActiveCollisionTypes::DYNAMIC_STATIC)
+        .insert(Damping {
+            linear_damping: 15.0,
+            angular_damping: 10.0,
+        });
 }
 
 pub fn player_movement(
@@ -213,34 +217,41 @@ pub fn player_enemy_collision(
 pub fn reload_gun(
     mut player_query: Query<&mut Ammo, With<Player>>,
     mut eq_gun: ResMut<EquippedGun>,
-    _time: Res<Time>,
     kb_input: Res<Input<KeyCode>>,
+    mut reload_timer: ResMut<ReloadTimer>,
 ) {
-    let gun = GunType {
+    let gun_data = GunType {
         gun_type: eq_gun.gun_type.clone(),
     };
 
+    let gun_magasine_capacity = gun_data.magasine_size();
+    let gun_type = gun_data.gun_type.clone() as usize;
+    let gun_reload_time = gun_data.reload_time();
+
     //handle crash if ammo vector does not exist cannot use unwrap
     if let Ok(mut player_ammo) = player_query.get_single_mut() {
-        let total_bullet = player_ammo.vec[gun.gun_type().clone() as usize].clone();
-
-
         if kb_input.just_released(KeyCode::R) {
-            if player_ammo.vec[gun.gun_type.clone() as usize] <= 0 {
+            reload_timer.time.tick(Duration::from_secs_f32(1.5));
+
+            if player_ammo.vec[gun_type] <= 0 {
                 println!("Out of bullets!!");
-            } else if eq_gun.bullets_in_magasine < gun.magasine_size().clone() {
+                reload_timer.time.reset();
+            } else if eq_gun.bullets_in_magasine < gun_magasine_capacity {
                 println!("Reloading...");
-                player_ammo.vec[0] -= (gun.magasine_size() - eq_gun.bullets_in_magasine) as i32;
-                eq_gun.bullets_in_magasine = gun.magasine_size();
-            } else {
-                println!("Magasine is full");
+                // start timer, reloading take x amount of time
+
+                if reload_timer.time.elapsed().as_secs_f32() >= gun_reload_time.as_secs_f32() {
+                    // subtact bullets in the magasin from total capacity of magezine, then add that to the magasine
+                    player_ammo.vec[gun_type] -=
+                        (gun_magasine_capacity - eq_gun.bullets_in_magasine) as i32;
+                    eq_gun.bullets_in_magasine = gun_magasine_capacity;
+                    reload_timer.time.reset();
+                } else {
+                    println!("Reloading...");
+                }
             }
         }
     }
-    
-    
-    
 
     //TODO fix the zero in 233 also need to add reload time
-
 }
