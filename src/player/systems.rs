@@ -21,7 +21,7 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
                 dimension: Vec2::new(PLAYER_SPRITE_SIZE + 5.0, PLAYER_SPRITE_SIZE + 5.0),
             },
             SpriteBundle {
-                transform: Transform::from_xyz(0.0, 0.0, 0.0),
+                transform: Transform::from_xyz(0.0, 0.0, 10.0),
                 texture: asset_server.load("graphic/player.png"),
                 ..default()
             },
@@ -72,7 +72,7 @@ pub fn player_movement(
 pub fn spawn_crosshair(mut cmd: Commands, asset_server: Res<AssetServer>) {
     cmd.spawn((
         SpriteBundle {
-            transform: Transform::from_xyz(0.0, 0.0, 0.0),
+            transform: Transform::from_xyz(0.0, 0.0, 15.0),
             texture: asset_server.load("graphic/crosshair.png"),
             ..default()
         },
@@ -100,7 +100,7 @@ pub fn update_crosshair(
         .map(|ray| ray.origin.truncate())
     {
         for mut transform in crosshair_query.iter_mut() {
-            transform.translation = Vec3::new(world_position.x, world_position.y, 0.0);
+            transform.translation = Vec3::new(world_position.x, world_position.y, 15.0);
         }
     }
 }
@@ -154,7 +154,7 @@ pub fn rotate_player(
                 let offset_laser_y = b;
                 let mut spawn_transform = Transform::from_scale(Vec3::splat(1.0));
                 spawn_transform.translation =
-                    transform.translation + Vec3::new(offset_laser_x, offset_laser_y, 0.0);
+                    transform.translation + Vec3::new(offset_laser_x, offset_laser_y, 5.0);
                 spawn_transform.rotation =
                     Quat::from_axis_angle(Vec3::new(0., 0., 1.), angle - PI / 2.0_f32);
 

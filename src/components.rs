@@ -163,6 +163,7 @@ pub struct GameTextures {
     pub enemy_zoomer: Handle<Image>,
     pub pickup_health: Handle<Image>,
     pub pickup_ammo: Handle<Image>,
+    pub error: Handle<Image>,
 }
 
 #[derive(Resource, Debug)]

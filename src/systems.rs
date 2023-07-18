@@ -6,7 +6,7 @@ use crate::components::{
 use bevy::prelude::*;
 use bevy::time::Stopwatch;
 use bevy::window::PrimaryWindow;
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+//use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier2d::prelude::*;
 use std::collections::HashSet;
 pub struct SetupPlugin;
@@ -19,7 +19,7 @@ impl Plugin for SetupPlugin {
             .add_plugins(DefaultPlugins)
             .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
             .add_plugin(RapierDebugRenderPlugin::default())
-            .add_plugin(WorldInspectorPlugin::new())
+            //.add_plugin(WorldInspectorPlugin::new())
             .add_system(camera_movement.in_base_set(StartupSet::PostStartup));
     }
 }
@@ -57,6 +57,7 @@ pub fn setup(
         enemy_zoomer: asset_server.load("graphic/zoomer.png"),
         pickup_health: asset_server.load("graphic/health_pickup.png"),
         pickup_ammo: asset_server.load("graphic/ammo_pickup.png"),
+        error: asset_server.load("graphic/icon.png"),
     };
 
     commands.insert_resource(game_textures);
