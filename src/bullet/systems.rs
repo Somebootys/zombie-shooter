@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::components::{
-    Bullet, ColliderSquare, Enemy, Health, Movable, BULLETSPEED, BULLET_SPRITE_DIMENSION,
+    Bullet, ColliderSquare, Enemy, Health, Movable, BULLETSPEED,
 };
 use bevy::sprite::collide_aabb::collide;
 use bevy_rapier2d::prelude::*;
@@ -17,10 +17,7 @@ pub fn update_bullets(
     for (entity, mut transform, movable, velocity) in query.iter_mut() {
         //update bullet position
 
-        //add collider to spawned bullet
-        commands.entity(entity).insert(ColliderSquare {
-            dimension: BULLET_SPRITE_DIMENSION,
-        });
+       
 
         //update bullet position
         transform.translation.x += velocity.linvel.x * time.delta_seconds() * BULLETSPEED;
@@ -35,7 +32,7 @@ pub fn update_bullets(
                 || transform.translation.y < -BULLET_RANGE
             {
                 println!("Despawn bullet: {:?}", entity);
-                commands.entity(entity).despawn();
+                commands.entity(entity).despawn_recursive();
             }
         }
     }
@@ -43,7 +40,7 @@ pub fn update_bullets(
 
 pub fn bullet_enemy_collision(
     query_bullet: Query<(Entity, &ColliderSquare, &Transform), With<Bullet>>,
-    query_enemy: Query<(Entity, &ColliderSquare, &Transform), With<Enemy>>,
+    query_enemy: Query<(Entity, &ColliderSquare, &Transform), (With<Enemy>, Without<Bullet>)>,
     mut enemy: Query<(Entity, &mut Health), With<Enemy>>,
     mut cmd: Commands,
 ) {

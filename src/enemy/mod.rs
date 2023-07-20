@@ -13,9 +13,9 @@ pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_enemy)
-            .add_startup_system(spawn_horde_of_enemies)
-            .add_system(update_enemy.after(player_movement))
+        app.add_systems(Startup, spawn_enemy)
+            .add_systems(Startup, spawn_horde_of_enemies)
+            .add_systems(Update, update_enemy.after(player_movement))
              //.add_system(check_collision_between_enemies)
             ;
     }

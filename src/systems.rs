@@ -14,13 +14,13 @@ pub struct SetupPlugin;
 impl Plugin for SetupPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(EnemyCount(0))
-            .add_startup_system(setup.in_base_set(StartupSet::PreStartup))
-            .add_startup_system(physics_setup.in_base_set(StartupSet::PreStartup))
+            .add_systems(PreStartup, setup)
+            .add_systems(PreStartup, physics_setup)
             .add_plugins(DefaultPlugins)
-            .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
-            .add_plugin(RapierDebugRenderPlugin::default())
+            .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
+            .add_plugins(RapierDebugRenderPlugin::default())
             //.add_plugin(WorldInspectorPlugin::new())
-            .add_system(camera_movement.in_base_set(StartupSet::PostStartup));
+            .add_systems(Update, camera_movement);
     }
 }
 

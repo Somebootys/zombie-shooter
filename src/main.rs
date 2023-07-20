@@ -16,6 +16,6 @@ use crate::game::GamePlugin;
 
 fn main() {
     App::new()
-        .add_plugin(GamePlugin)
+        .add_plugins(GamePlugin)
         .run();
 }

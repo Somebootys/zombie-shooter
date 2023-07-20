@@ -10,12 +10,12 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_player)
-            .add_startup_system(spawn_crosshair)
-            .add_system(player_movement)
-            .add_system(update_crosshair)
-            .add_system(rotate_player)
-            .add_system(player_enemy_collision)
-            .add_system(reload_gun);
+        app.add_systems(Startup, spawn_player)
+            .add_systems(Startup, spawn_crosshair)
+            .add_systems(Update, player_movement)
+            .add_systems(Update, update_crosshair)
+            .add_systems(Update, rotate_player)
+            .add_systems(Update, player_enemy_collision)
+            .add_systems(Update, reload_gun);
     }
 }

@@ -12,11 +12,11 @@ use crate::systems::SetupPlugin;
 pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(ArenaPlugin)
-            .add_plugin(BulletPlugin)
-            .add_plugin(EnemyPlugin)
-            .add_plugin(PickUpPlugin)
-            .add_plugin(PlayerPlugin)
-            .add_plugin(SetupPlugin);
+        app.add_plugins(ArenaPlugin)
+            .add_plugins(BulletPlugin)
+            .add_plugins(EnemyPlugin)
+            .add_plugins(PickUpPlugin)
+            .add_plugins(PlayerPlugin)
+            .add_plugins(SetupPlugin);
     }
 }

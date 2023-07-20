@@ -1,6 +1,6 @@
 use crate::components::{
     Ammo, Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, GunType, Health, LastDamaged,
-    MainCamera, Movable, Player, PlayerDamagedTimer, ReloadTimer, PLAYER_SPRITE_SIZE,
+    MainCamera, Movable, Player, PlayerDamagedTimer, ReloadTimer, PLAYER_SPRITE_SIZE, BULLET_SPRITE_DIMENSION
 };
 use bevy::prelude::*;
 use bevy::window::Window;
@@ -170,7 +170,11 @@ pub fn rotate_player(
                         linvel: diff.normalize(),
                         angvel: angle,
                     },
-                ));
+                ))
+                 //add collider to spawned bullet
+                .insert(ColliderSquare {
+                     dimension: BULLET_SPRITE_DIMENSION,
+        });
                 if eq_gun.bullets_in_magasine == 0 {
                     println!("Out of bullets!!");
                 } else {
