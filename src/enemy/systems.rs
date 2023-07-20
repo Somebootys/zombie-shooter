@@ -16,7 +16,7 @@ use rand::Rng;
 
 
 
-pub fn spawn_enemy(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn _spawn_enemy(mut commands: Commands, asset_server: Res<AssetServer>) {
     let off_set = 30.0;
 
     let mut rng = rand::thread_rng();

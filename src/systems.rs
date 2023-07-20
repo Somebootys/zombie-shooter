@@ -1,6 +1,6 @@
 use crate::components::{
-    DespawnedEnemies, EnemyCount, EquippedGun, GameTextures, Guns, LastDamaged, MainCamera,
-    PickUpTimer, Player, ReloadTimer, WinSize,
+    DespawnedEnemies, EquippedGun, GameTextures, Guns, LastDamaged, MainCamera,
+    PickUpTimer, Player, ReloadTimer, WinSize,AppState
 };
 
 use bevy::prelude::*;
@@ -13,14 +13,13 @@ pub struct SetupPlugin;
 
 impl Plugin for SetupPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(EnemyCount(0))
-            .add_systems(PreStartup, setup)
-            .add_systems(PreStartup, physics_setup)
-            .add_plugins(DefaultPlugins)
+        app
+            .add_systems( OnEnter(AppState::Menu), (setup, physics_setup))
+            
             .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
-            .add_plugins(RapierDebugRenderPlugin::default())
+            //.add_plugins(RapierDebugRenderPlugin::default())
             //.add_plugin(WorldInspectorPlugin::new())
-            .add_systems(Update, camera_movement);
+            .add_systems(Update, camera_movement.run_if(in_state(AppState::InGame) ));
     }
 }
 

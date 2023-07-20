@@ -23,6 +23,14 @@ pub const ARENA_SIZE: f32 = 1000.0;
 //---------------------------------------------------------------------------------Components
 
 /// Used to help identify our main camera
+/// 
+/// 
+#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
+pub enum AppState {
+    #[default]
+    Menu,
+    InGame,
+}
 #[derive(Component)]
 pub struct MainCamera;
 
