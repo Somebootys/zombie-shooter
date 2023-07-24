@@ -11,6 +11,7 @@ pub mod enemy;
 pub mod pickup;
 pub mod player;
 pub mod systems;
+pub mod hud;
 
 use crate::game::GamePlugin;
 use crate::components::{AppState, EnemyCount};

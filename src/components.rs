@@ -23,8 +23,11 @@ pub const ARENA_SIZE: f32 = 1000.0;
 //---------------------------------------------------------------------------------Components
 
 /// Used to help identify our main camera
-/// 
-/// 
+
+
+
+
+
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
 pub enum AppState {
     #[default]
@@ -120,10 +123,23 @@ impl GunType {
     }
 }
 
+
+#[derive(Component)]
+pub struct ScoreText;
+
 #[derive(Component)]
 pub struct PickUpDuration {
     pub time: Stopwatch,
 }
+
+#[derive(Component)]
+pub struct AmmoText;
+
+
+#[derive(Component)]
+pub struct HealthText;
+
+#[derive(Component)]
 
 #[derive(Resource, Debug)]
 pub struct ReloadTimer {
@@ -193,4 +209,11 @@ pub struct PickUpTimer {
 pub struct EquippedGun {
     pub gun_type: Guns,
     pub bullets_in_magasine: usize,
+    pub mag_capacity: usize,
+
 }
+
+#[derive(Resource, Debug)]
+pub struct Score (
+    pub i32,
+);

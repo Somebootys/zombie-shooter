@@ -82,6 +82,7 @@ pub fn setup(
     let gun = EquippedGun {
         gun_type: Guns::Pistol,
         bullets_in_magasine: 8,
+        mag_capacity: 8,
     };
     //insert equipped gun
     commands.insert_resource(gun);
