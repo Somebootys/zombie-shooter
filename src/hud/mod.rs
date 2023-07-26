@@ -41,9 +41,9 @@ pub fn hud_setup(
         ..default()
     };
 
-    let texture_handle_ammo = asset_server.load("graphics/ammo_icon.png");
-    let texture_handle_health = asset_server.load("graphics/health_pickup.png");
-    let texture_handle_crosshair = asset_server.load("graphics/crosshair.png");
+    let texture_handle_ammo = asset_server.load("graphic/ammo_icon.png");
+    let texture_handle_health = asset_server.load("graphic/health_pickup.png");
+    let texture_handle_crosshair = asset_server.load("graphic/crosshair.png");
     // root node
 
     
@@ -228,11 +228,12 @@ pub fn hud_score_update_system(
         
         for mut text in &mut query {
 
-            if Some(query_ammo.iter().next().unwrap().vec[0]) != None {
-                let ammo = query_ammo.iter().next().unwrap();
+            if let Some(ammo) = query_ammo.iter().next() {
+               
             
             
-            let bullet_in_mag = eq_gun.bullets_in_magasine;
+            
+             let bullet_in_mag = eq_gun.bullets_in_magasine;
 
 
             let bullets_in_inventory = ammo.vec[0];
@@ -243,21 +244,20 @@ pub fn hud_score_update_system(
                     text.sections[3].value = format!("{bullets_in_inventory:.2}");
                 
         
-        }
+            }
         }
     }
 
     pub fn hud_health_update_system(
         mut query: Query<&mut Text, With<HealthText>>,
-        health: Query<&Health, With<Player>>,
+        health_query: Query<&Health, With<Player>>,
     ) {
         
         for mut text in &mut query {
             
             
-            if Some(health.iter().next().unwrap().hp) != None {
-                let hp = health.iter().next().unwrap().hp;
-            
+            if let Some(health) = health_query.iter().next() {
+            let hp = health.hp;
              
                     // Update the value of the second section
                     text.sections[1].value = format!("{hp:.2}");
