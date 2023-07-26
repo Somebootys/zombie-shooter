@@ -217,3 +217,7 @@ pub struct EquippedGun {
 pub struct Score (
     pub i32,
 );
+#[derive(Resource)]
+pub struct MenuData {
+    pub button_entity: Entity,
+}
