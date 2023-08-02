@@ -1,6 +1,6 @@
 use crate::components::{
-    DespawnedEnemies, EquippedGun, GameTextures, Guns, LastDamaged, MainCamera,
-    PickUpTimer, Player, ReloadTimer, WinSize,AppState
+    AppState, DespawnedEnemies, EquippedGun, GameScore, GameTextures, Guns, LastDamaged,
+    MainCamera, PickUpTimer, Player, ReloadTimer, WinSize,
 };
 
 use bevy::prelude::*;
@@ -13,13 +13,12 @@ pub struct SetupPlugin;
 
 impl Plugin for SetupPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_systems( OnEnter(AppState::Menu), (setup, physics_setup))
-            
+        app.add_systems(Startup, (setup, physics_setup))
+            //.add_systems( OnEnter(AppState::InGame), (setup, physics_setup))
             .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
             //.add_plugins(RapierDebugRenderPlugin::default())
             //.add_plugin(WorldInspectorPlugin::new())
-            .add_systems(Update, camera_movement.run_if(in_state(AppState::InGame) ));
+            .add_systems(Update, camera_movement.run_if(in_state(AppState::InGame)));
     }
 }
 
@@ -32,8 +31,6 @@ pub fn setup(
     query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,
 ) {
-    commands.spawn((Camera2dBundle::default(), MainCamera));
-
     //win resource init
     let Ok(primary) = query.get_single() else {
         return;
@@ -46,6 +43,11 @@ pub fn setup(
     };
 
     commands.insert_resource(win_size);
+
+    //insert score resource
+    let score = GameScore(0);
+
+    commands.insert_resource(score);
 
     //texture atlas resource init
     let game_textures = GameTextures {
@@ -107,5 +109,13 @@ pub fn camera_movement(
             camera_transform.translation.x = player_transform.translation.x;
             camera_transform.translation.y = player_transform.translation.y;
         }
+    }
+}
+
+//keep count of despawned enemies
+
+pub fn despawn_screen<T: Component>(to_despawn: Query<Entity, With<T>>, mut commands: Commands) {
+    for entity in &to_despawn {
+        commands.entity(entity).despawn_recursive();
     }
 }

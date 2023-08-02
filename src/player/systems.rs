@@ -1,6 +1,7 @@
 use crate::components::{
-    Ammo, Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, GunType, Health, LastDamaged,
-    MainCamera, Movable, Player, PlayerDamagedTimer, ReloadTimer, PLAYER_SPRITE_SIZE, BULLET_SPRITE_DIMENSION
+    Ammo, AppState, Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, GunType, Health,
+    LastDamaged, MainCamera, Movable, OnGameScreenMarker, Player, PlayerDamagedTimer, ReloadTimer,
+    BULLET_SPRITE_DIMENSION, PLAYER_SPRITE_SIZE,
 };
 use bevy::prelude::*;
 use bevy::window::Window;
@@ -34,6 +35,7 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
                 linvel: Vec2::new(0.0, 0.0),
                 angvel: 0.0,
             },
+            OnGameScreenMarker,
             Collider::cuboid(PLAYER_SPRITE_SIZE / 2.0, PLAYER_SPRITE_SIZE / 2.0),
         ))
         //.insert(LockedAxes::TRANSLATION_LOCKED)
@@ -48,6 +50,7 @@ pub fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
 
     mut player_info: Query<(&Player, &mut Velocity)>,
+    mut state: ResMut<NextState<AppState>>,
 ) {
     for (player, mut rb_vels) in &mut player_info {
         let up = keyboard_input.any_pressed([KeyCode::W, KeyCode::Up]);
@@ -55,12 +58,18 @@ pub fn player_movement(
         let left = keyboard_input.any_pressed([KeyCode::A, KeyCode::Left]);
         let right = keyboard_input.any_pressed([KeyCode::D, KeyCode::Right]);
 
+        let debug: bool = keyboard_input.any_pressed([KeyCode::Y]);
+
         let x_axis = -(left as i8) + right as i8;
         let y_axis = -(down as i8) + up as i8;
 
         let mut move_delta = Vec2::new(x_axis as f32, y_axis as f32);
         if move_delta != Vec2::ZERO {
             move_delta /= move_delta.length();
+        }
+
+        if debug {
+            state.set(AppState::LevelUp);
         }
 
         // Update the velocity on the rigid_body_component,
@@ -77,6 +86,7 @@ pub fn spawn_crosshair(mut cmd: Commands, asset_server: Res<AssetServer>) {
             ..default()
         },
         CrossHair,
+        OnGameScreenMarker,
     ));
 }
 pub fn update_crosshair(
@@ -88,19 +98,21 @@ pub fn update_crosshair(
 ) {
     // get the camera info and transform
     // assuming there is exactly one main camera entity, so query::single() is OK
-    let (camera, camera_transform) = camera_q.single();
-    // get the window that the camera is displaying to (or the primary window)
-    let window = windows.single_mut();
 
-    // check if the cursor is inside the window and get its position
-    // then, ask bevy to convert into world coordinates, and truncate to discard Z
-    if let Some(world_position) = window
-        .cursor_position()
-        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
-        .map(|ray| ray.origin.truncate())
-    {
-        for mut transform in crosshair_query.iter_mut() {
-            transform.translation = Vec3::new(world_position.x, world_position.y, 15.0);
+    if let Ok((camera, camera_transform)) = camera_q.get_single() {
+        // get the window that the camera is displaying to (or the primary window)
+        let window = windows.single_mut();
+
+        // check if the cursor is inside the window and get its position
+        // then, ask bevy to convert into world coordinates, and truncate to discard Z
+        if let Some(world_position) = window
+            .cursor_position()
+            .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+            .map(|ray| ray.origin.truncate())
+        {
+            for mut transform in crosshair_query.iter_mut() {
+                transform.translation = Vec3::new(world_position.x, world_position.y, 15.0);
+            }
         }
     }
 }
@@ -119,66 +131,66 @@ pub fn rotate_player(
     mut eq_gun: ResMut<EquippedGun>,
 ) {
     // get the camera info and transform
-    // assuming there is exactly one main camera entity, so query::single() is OK
-    let (camera, camera_transform) = camera_q.single();
+    // assuming there is exactly one main camera entity, so query::single() is OK. However, adding more states, I need get_single, and I need to handle potential 'no camera'-cases
+    if let Ok((camera, camera_transform)) = camera_q.get_single() {
+        // get the window that the camera is displaying to (or the primary window)
+        let window = windows.single_mut();
 
-    // get the window that the camera is displaying to (or the primary window)
-    let window = windows.single_mut();
+        // check if the cursor is inside the window and get its position
+        // then, ask bevy to convert into world coordinates, and truncate to discard Z
+        if let Some(world_position) = window
+            .cursor_position()
+            .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+            .map(|ray| ray.origin.truncate())
+        {
+            // face the player towards the cursor
+            if let Ok(mut transform) = player_query.get_single_mut() {
+                let (x, y) = (transform.translation.x, transform.translation.y);
 
-    // check if the cursor is inside the window and get its position
-    // then, ask bevy to convert into world coordinates, and truncate to discard Z
-    if let Some(world_position) = window
-        .cursor_position()
-        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
-        .map(|ray| ray.origin.truncate())
-    {
-        // face the player towards the cursor
-        if let Ok(mut transform) = player_query.get_single_mut() {
-            let (x, y) = (transform.translation.x, transform.translation.y);
+                // get the angle between the player and the cursor in radians. atan2f is the inverse tangent function y/x, and returns radians.
+                let angle = libm::atan2f(world_position.y - y, world_position.x - x);
+                let diff = world_position - Vec2::new(x, y);
 
-            // get the angle between the player and the cursor in radians. atan2f is the inverse tangent function y/x, and returns radians.
-            let angle = libm::atan2f(world_position.y - y, world_position.x - x);
-            let diff = world_position - Vec2::new(x, y);
+                //Rotate the sprite around the z axis by the angle. transform.rotation takes a Quat, also needs to be in radians, so no need to convert the angle.
+                transform.rotation = Quat::from_rotation_z(angle);
 
-            //Rotate the sprite around the z axis by the angle. transform.rotation takes a Quat, also needs to be in radians, so no need to convert the angle.
-            transform.rotation = Quat::from_rotation_z(angle);
+                //TODO: review if this is the best way to handle the offset
 
-            //TODO: review if this is the best way to handle the offset
+                if buttons.just_released(MouseButton::Left) && eq_gun.bullets_in_magasine > 0 {
+                    let c = PLAYER_SPRITE_SIZE.clone();
+                    let a = libm::cosf(angle) * c;
+                    let b: f32 = libm::sinf(angle) * c;
 
-            if buttons.just_released(MouseButton::Left) && eq_gun.bullets_in_magasine > 0 {
-                let c = PLAYER_SPRITE_SIZE.clone();
-                let a = libm::cosf(angle) * c;
-                let b: f32 = libm::sinf(angle) * c;
+                    let offset_laser_x = a;
+                    let offset_laser_y = b;
+                    let mut spawn_transform = Transform::from_scale(Vec3::splat(1.0));
+                    spawn_transform.translation =
+                        transform.translation + Vec3::new(offset_laser_x, offset_laser_y, 5.0);
+                    spawn_transform.rotation =
+                        Quat::from_axis_angle(Vec3::new(0., 0., 1.), angle - PI / 2.0_f32);
 
-                let offset_laser_x = a;
-                let offset_laser_y = b;
-                let mut spawn_transform = Transform::from_scale(Vec3::splat(1.0));
-                spawn_transform.translation =
-                    transform.translation + Vec3::new(offset_laser_x, offset_laser_y, 5.0);
-                spawn_transform.rotation =
-                    Quat::from_axis_angle(Vec3::new(0., 0., 1.), angle - PI / 2.0_f32);
-
-                cmd.spawn((
-                    SpriteBundle {
-                        transform: spawn_transform,
-                        texture: asset_server.load("graphic/laser_a_01.png"),
-                        ..default()
-                    },
-                    Bullet { angle: angle },
-                    Movable { auto_despawn: true },
-                    Velocity {
-                        linvel: diff.normalize(),
-                        angvel: angle,
-                    },
-                ))
-                 //add collider to spawned bullet
-                .insert(ColliderSquare {
-                     dimension: BULLET_SPRITE_DIMENSION,
-        });
-                if eq_gun.bullets_in_magasine == 0 {
-                    println!("Out of bullets!!");
-                } else {
-                    eq_gun.bullets_in_magasine -= 1;
+                    cmd.spawn((
+                        SpriteBundle {
+                            transform: spawn_transform,
+                            texture: asset_server.load("graphic/laser_a_01.png"),
+                            ..default()
+                        },
+                        Bullet { angle: angle },
+                        Movable { auto_despawn: true },
+                        Velocity {
+                            linvel: diff.normalize(),
+                            angvel: angle,
+                        },
+                    ))
+                    //add collider to spawned bullet
+                    .insert(ColliderSquare {
+                        dimension: BULLET_SPRITE_DIMENSION,
+                    });
+                    if eq_gun.bullets_in_magasine == 0 {
+                        println!("Out of bullets!!");
+                    } else {
+                        eq_gun.bullets_in_magasine -= 1;
+                    }
                 }
             }
         }

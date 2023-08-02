@@ -24,15 +24,12 @@ pub const ARENA_SIZE: f32 = 1000.0;
 
 /// Used to help identify our main camera
 
-
-
-
-
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
 pub enum AppState {
     #[default]
     Menu,
     InGame,
+    LevelUp,
 }
 #[derive(Component)]
 pub struct MainCamera;
@@ -123,7 +120,6 @@ impl GunType {
     }
 }
 
-
 #[derive(Component)]
 pub struct ScoreText;
 
@@ -135,11 +131,11 @@ pub struct PickUpDuration {
 #[derive(Component)]
 pub struct AmmoText;
 
-
 #[derive(Component)]
 pub struct HealthText;
 
 #[derive(Component)]
+pub struct OnGameScreenMarker;
 
 #[derive(Resource, Debug)]
 pub struct ReloadTimer {
@@ -210,13 +206,11 @@ pub struct EquippedGun {
     pub gun_type: Guns,
     pub bullets_in_magasine: usize,
     pub mag_capacity: usize,
-
 }
 
 #[derive(Resource, Debug)]
-pub struct Score (
-    pub i32,
-);
+pub struct GameScore(pub i32);
+
 #[derive(Resource)]
 pub struct MenuData {
     pub button_entity: Entity,

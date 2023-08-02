@@ -1,18 +1,20 @@
 use bevy::prelude::*;
 
 use crate::components::{AppState, MenuData};
+
+use super::systems::despawn_screen;
+
+#[derive(Component)]
+pub struct OnMenuScreenMarker;
 pub struct GameMenuPlugin;
 
 impl Plugin for GameMenuPlugin {
     fn build(&self, app: &mut App) {
-        app
-        .add_systems(OnEnter(AppState::Menu), setup_menu)
-        // By contrast, update systems are stored in the `Update` schedule. They simply
-        // check the value of the `State<T>` resource to see if they should run each frame.
-        .add_systems(Update, menu.run_if(in_state(AppState::Menu)))
-        .add_systems(OnExit(AppState::Menu), cleanup_menu);
-             
-       
+        app.add_systems(OnEnter(AppState::Menu), (setup_menu, setup))
+            // By contrast, update systems are stored in the `Update` schedule. They simply
+            // check the value of the `State<T>` resource to see if they should run each frame.
+            .add_systems(Update, menu.run_if(in_state(AppState::Menu)))
+            .add_systems(OnExit(AppState::Menu), despawn_screen::<OnMenuScreenMarker>);
     }
 }
 
@@ -20,22 +22,25 @@ const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
 const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
 
-fn _setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+fn setup(mut commands: Commands) {
+    commands.spawn((Camera2dBundle::default(), OnMenuScreenMarker));
 }
 
 fn setup_menu(mut commands: Commands) {
     let button_entity = commands
-        .spawn(NodeBundle {
-            style: Style {
-                // center button
-                width: Val::Percent(100.),
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    // center button
+                    width: Val::Percent(100.),
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    ..default()
+                },
                 ..default()
             },
-            ..default()
-        })
+            OnMenuScreenMarker,
+        ))
         .with_children(|parent| {
             parent
                 .spawn(ButtonBundle {
@@ -87,8 +92,4 @@ fn menu(
             }
         }
     }
-}
-
-fn cleanup_menu(mut commands: Commands, menu_data: Res<MenuData>) {
-    commands.entity(menu_data.button_entity).despawn_recursive();
 }

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::components::{
-    Bullet, ColliderSquare, Enemy, Health, Movable, BULLETSPEED,
+    AppState, Bullet, ColliderSquare, DespawnedEnemies, Enemy, Health, Movable, BULLETSPEED,
 };
 use bevy::sprite::collide_aabb::collide;
 use bevy_rapier2d::prelude::*;
@@ -16,8 +16,6 @@ pub fn update_bullets(
 ) {
     for (entity, mut transform, movable, velocity) in query.iter_mut() {
         //update bullet position
-
-       
 
         //update bullet position
         transform.translation.x += velocity.linvel.x * time.delta_seconds() * BULLETSPEED;
@@ -42,6 +40,7 @@ pub fn bullet_enemy_collision(
     query_bullet: Query<(Entity, &ColliderSquare, &Transform), With<Bullet>>,
     query_enemy: Query<(Entity, &ColliderSquare, &Transform), (With<Enemy>, Without<Bullet>)>,
     mut enemy: Query<(Entity, &mut Health), With<Enemy>>,
+    mut killed_enemies: ResMut<DespawnedEnemies>,
     mut cmd: Commands,
 ) {
     let mut despawned_entities: HashSet<Entity> = HashSet::new();
@@ -80,6 +79,7 @@ pub fn bullet_enemy_collision(
                         if health.hp <= 0 {
                             cmd.entity(enemy_entity).despawn();
                             despawned_entities.insert(enemy_entity);
+                            killed_enemies.entities.insert(enemy_entity);
                         }
                     }
                 }
@@ -87,5 +87,14 @@ pub fn bullet_enemy_collision(
                 break;
             }
         }
+    }
+}
+
+pub fn next_level(
+    killed_enemies: ResMut<DespawnedEnemies>,
+    mut state: ResMut<NextState<AppState>>,
+) {
+    if killed_enemies.entities.len() == 9 {
+        state.set(AppState::LevelUp);
     }
 }

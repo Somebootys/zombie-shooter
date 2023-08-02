@@ -1,12 +1,11 @@
 use crate::components::{
-    Ammo, ColliderSquare, EquippedGun, GameTextures, GunType, Health, PickUp, PickUpDuration,
-    PickUpTimer, Player, ARENA_SIZE, PICKUP_SPRITE_SIZE, PICK_UP_DURATION, TILE_SIZE,
+    Ammo, ColliderSquare, EquippedGun, GameTextures, GunType, Health, OnGameScreenMarker, PickUp,
+    PickUpDuration, PickUpTimer, Player, ARENA_SIZE, PICKUP_SPRITE_SIZE, PICK_UP_DURATION,
+    TILE_SIZE,
 };
 use bevy::prelude::*;
 use bevy::time::Stopwatch;
 use rand::Rng;
-
-
 
 pub fn spawn_pickup(
     mut cmd: Commands,
@@ -14,16 +13,16 @@ pub fn spawn_pickup(
     time: Res<Time>,
     mut pickup_timer: ResMut<PickUpTimer>,
 ) {
-    let width = ARENA_SIZE /2.0 ;
-    let height = ARENA_SIZE /2.0 ;
+    let width = ARENA_SIZE / 2.0;
+    let height = ARENA_SIZE / 2.0;
     let z = 5.0_f32;
     if pickup_timer.time.tick(time.delta()).just_finished() {
         let mut rng = rand::thread_rng();
 
         // possible spawn locations are the entire screen
-        let x = rng.gen_range(-width + 2.0*TILE_SIZE..width - 2.0*TILE_SIZE);
-        let y = rng.gen_range(-height + 2.0*TILE_SIZE..height - 2.0*TILE_SIZE);
-        let pickup_type: u8 =  rng.gen_range(0..2);
+        let x = rng.gen_range(-width + 2.0 * TILE_SIZE..width - 2.0 * TILE_SIZE);
+        let y = rng.gen_range(-height + 2.0 * TILE_SIZE..height - 2.0 * TILE_SIZE);
+        let pickup_type: u8 = rng.gen_range(0..2);
         println!("pickup type: {:?}", pickup_type);
 
         let tex = match pickup_type {
@@ -49,6 +48,7 @@ pub fn spawn_pickup(
             PickUpDuration {
                 time: Stopwatch::new(),
             },
+            OnGameScreenMarker,
         ));
 
         println!("spawned pickup");

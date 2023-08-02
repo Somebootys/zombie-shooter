@@ -1,9 +1,7 @@
-
-use crate::components::{ArenaSize, TileIndices, TILE_SIZE, TILE_TYPES};
+use crate::components::{ArenaSize, OnGameScreenMarker, TileIndices, TILE_SIZE, TILE_TYPES};
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use rand::Rng;
-
 
 pub fn setup(
     mut commands: Commands,
@@ -67,6 +65,7 @@ pub fn setup(
                             ..default()
                         },
                         tile_indices,
+                        OnGameScreenMarker,
                         RigidBody::Fixed,
                         Collider::cuboid(TILE_SIZE / 2.0, TILE_SIZE / 2.0),
                     ))
@@ -91,6 +90,8 @@ pub fn setup(
                         ..default()
                     },
                     tile_indices,
+                    //this struct is for despawning when we leave the game screen
+                    OnGameScreenMarker,
                 ));
             }
         }
