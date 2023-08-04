@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-mod systems;
-use systems::setup;
+pub mod systems;
+use systems::*;
 
 use crate::components::AppState;
 

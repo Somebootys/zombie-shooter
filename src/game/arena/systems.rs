@@ -1,4 +1,5 @@
-use crate::components::{ArenaSize, OnGameScreenMarker, TileIndices, TILE_SIZE, TILE_TYPES};
+use crate::components::{ArenaSize, TileIndices};
+use crate::game::components::{OnGameScreenMarker, TILE_SIZE, TILE_TYPES};
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use rand::Rng;

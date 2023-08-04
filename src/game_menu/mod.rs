@@ -1,12 +1,17 @@
 use bevy::prelude::*;
 
-use crate::components::{AppState, MenuData};
+use crate::components::AppState;
 
 use super::systems::despawn_screen;
 
 #[derive(Component)]
 pub struct OnMenuScreenMarker;
 pub struct GameMenuPlugin;
+
+#[derive(Resource)]
+pub struct MenuData {
+    pub button_entity: Entity,
+}
 
 impl Plugin for GameMenuPlugin {
     fn build(&self, app: &mut App) {

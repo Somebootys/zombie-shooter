@@ -1,8 +1,11 @@
-use crate::components::{
-    Ammo, AppState, Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, GunType, Health,
-    LastDamaged, MainCamera, Movable, OnGameScreenMarker, Player, PlayerDamagedTimer, ReloadTimer,
+use crate::components::AppState;
+
+use crate::game::components::{
+    Ammo, Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, GunType, Health, LastDamaged,
+    MainCamera, Movable, OnGameScreenMarker, Player, PlayerDamagedTimer, ReloadTimer,
     BULLET_SPRITE_DIMENSION, PLAYER_SPRITE_SIZE,
 };
+
 use bevy::prelude::*;
 use bevy::window::Window;
 use bevy_rapier2d::prelude::*;

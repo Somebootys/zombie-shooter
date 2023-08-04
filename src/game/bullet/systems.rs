@@ -1,8 +1,11 @@
 use bevy::prelude::*;
 
-use crate::components::{
-    AppState, Bullet, ColliderSquare, DespawnedEnemies, Enemy, Health, Movable, BULLETSPEED,
+use crate::components::AppState;
+
+use crate::game::components::{
+    Bullet, ColliderSquare, DespawnedEnemies, Enemy, Health, Movable, BULLETSPEED,
 };
+
 use bevy::sprite::collide_aabb::collide;
 use bevy_rapier2d::prelude::*;
 use std::collections::HashSet;

@@ -5,9 +5,11 @@ mod systems;
 
 use systems::*;
 
-use super::systems::despawn_screen;
-use crate::components::{AppState, Enemy};
-use crate::player::systems::player_movement;
+use super::super::systems::despawn_screen;
+use crate::components::AppState;
+
+use super::player::systems::player_movement;
+use crate::game::components::Enemy;
 pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {

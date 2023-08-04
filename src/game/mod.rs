@@ -1,13 +1,23 @@
 use bevy::prelude::*;
 
-use crate::arena::ArenaPlugin;
-use crate::bullet::BulletPlugin;
-use crate::components::{AppState, MainCamera, OnGameScreenMarker};
-use crate::enemy::EnemyPlugin;
-use crate::hud::HudPlugin;
-use crate::pickup::PickUpPlugin;
-use crate::player::PlayerPlugin;
-use crate::systems::{despawn_screen, SetupPlugin};
+pub mod arena;
+pub mod bullet;
+pub mod components;
+pub mod enemy;
+pub mod hud;
+pub mod pickup;
+pub mod player;
+pub mod setup;
+use components::{MainCamera, OnGameScreenMarker};
+
+//import all the game plugins
+use crate::game::{
+    arena::ArenaPlugin, bullet::BulletPlugin, enemy::EnemyPlugin, hud::HudPlugin,
+    pickup::PickUpPlugin, player::PlayerPlugin, setup::SetupPlugin,
+};
+
+use crate::components::AppState;
+use crate::systems::despawn_screen;
 
 pub struct GamePlugin;
 impl Plugin for GamePlugin {
@@ -20,6 +30,7 @@ impl Plugin for GamePlugin {
             .add_plugins(SetupPlugin)
             .add_plugins(HudPlugin)
             .add_systems(OnEnter(AppState::InGame), setup)
+            //when I exit the game screen, despawn all the entities otherwise they will be rendered on top of the menu screen or whatever screen I go to next
             .add_systems(
                 OnExit(AppState::InGame),
                 despawn_screen::<OnGameScreenMarker>,

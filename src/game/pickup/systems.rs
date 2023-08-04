@@ -1,11 +1,12 @@
-use crate::components::{
+use bevy::prelude::*;
+use bevy::time::Stopwatch;
+use rand::Rng;
+
+use crate::game::components::{
     Ammo, ColliderSquare, EquippedGun, GameTextures, GunType, Health, OnGameScreenMarker, PickUp,
     PickUpDuration, PickUpTimer, Player, ARENA_SIZE, PICKUP_SPRITE_SIZE, PICK_UP_DURATION,
     TILE_SIZE,
 };
-use bevy::prelude::*;
-use bevy::time::Stopwatch;
-use rand::Rng;
 
 pub fn spawn_pickup(
     mut cmd: Commands,
