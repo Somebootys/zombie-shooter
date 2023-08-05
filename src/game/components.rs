@@ -68,6 +68,82 @@ pub struct PickUp {
 }
 
 // --------------------------------------------------------------------------------ENUMS
+
+#[derive( Debug, Clone)]
+pub enum GunType {
+    Pistol,
+    Shotgun,
+    MachineGun,
+}
+
+#[derive( Debug, Clone )]
+pub struct Magazine {
+    pub current: usize,
+    pub capacity: usize,
+}
+
+#[derive(Component, Debug, Clone)]
+pub struct Gun {
+    pub r#type: GunType,
+    pub magazine: Magazine,
+    pub damage: usize,
+    pub reload_time: Duration,
+}
+
+impl Gun {
+    pub fn from_gun_type(r#type: GunType) -> Self {
+        return match r#type {
+            GunType::Pistol => Self {
+                r#type,
+                damage: 10,
+                reload_time: Duration::from_secs_f32(1.5),
+                magazine: Magazine {
+                    current: 8,
+                    capacity: 8,
+                },
+            },
+            GunType::Shotgun => Self {
+                r#type,
+                damage: 30,
+                reload_time: Duration::from_secs_f32(2.5),
+                magazine: Magazine {
+                    current: 3,
+                    capacity: 3,
+                },
+            },
+            GunType::MachineGun => Self {
+                r#type,
+                damage: 10,
+                reload_time: Duration::from_secs_f32(1.0),
+                magazine: Magazine {
+                    current: 30,
+                    capacity: 30,
+                },
+            },
+        };
+    }
+}
+
+#[derive(Resource)]
+pub struct AmmoCount{
+    pub pistol: usize,
+    pub shotgun: usize,
+    pub machine_gun: usize,
+
+}
+use std::ops::Index;
+impl Index<usize> for AmmoCount {
+    type Output = usize;
+    fn index(&self, i:usize ) -> &usize {
+        match i {
+            0 => &self.pistol,
+            1 => &self.shotgun,
+            2 => &self.machine_gun,
+            _ => panic!("Index out of bounds for AmmoCount"),
+        }
+    }
+}
+/* 
 #[derive(Debug, Clone)]
 pub enum Guns {
     Pistol,
@@ -113,7 +189,7 @@ impl GunType {
         }
     }
 }
-
+*/
 #[derive(Component)]
 pub struct ScoreText;
 
@@ -172,8 +248,4 @@ pub struct PickUpTimer {
 }
 
 #[derive(Resource, Debug, Clone)]
-pub struct EquippedGun {
-    pub gun_type: Guns,
-    pub bullets_in_magasine: usize,
-    pub mag_capacity: usize,
-}
+pub struct EquippedGun (pub Gun);

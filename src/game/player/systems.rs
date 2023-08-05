@@ -1,8 +1,8 @@
 use crate::components::AppState;
 
 use crate::game::components::{
-    Ammo, Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, GunType, Health, LastDamaged,
-    MainCamera, Movable, OnGameScreenMarker, Player, PlayerDamagedTimer, ReloadTimer,
+    AmmoCount, Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, Health, LastDamaged,
+    MainCamera, Movable, OnGameScreenMarker, Player, PlayerDamagedTimer,
     BULLET_SPRITE_DIMENSION, PLAYER_SPRITE_SIZE,
 };
 
@@ -13,7 +13,7 @@ use bevy_rapier2d::prelude::*;
 use bevy::sprite::collide_aabb::collide;
 use libm;
 use std::f32::consts::PI;
-use std::time::Duration;
+//use std::time::Duration;
 //use bevy::utils::Duration;
 
 const PLAYER_SPEED: f32 = 500.0;
@@ -32,7 +32,6 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
             Player(PLAYER_SPEED),
             PlayerDamagedTimer(Timer::from_seconds(10.0, TimerMode::Once)),
             Health { hp: 50 },
-            Ammo { vec: [8, 0, 0] },
             RigidBody::Dynamic,
             Velocity {
                 linvel: Vec2::new(0.0, 0.0),
@@ -159,7 +158,7 @@ pub fn rotate_player(
 
                 //TODO: review if this is the best way to handle the offset
 
-                if buttons.just_released(MouseButton::Left) && eq_gun.bullets_in_magasine > 0 {
+                if buttons.just_released(MouseButton::Left) && eq_gun.0.magazine.current > 0 {
                     let c = PLAYER_SPRITE_SIZE.clone();
                     let a = libm::cosf(angle) * c;
                     let b: f32 = libm::sinf(angle) * c;
@@ -189,10 +188,10 @@ pub fn rotate_player(
                     .insert(ColliderSquare {
                         dimension: BULLET_SPRITE_DIMENSION,
                     });
-                    if eq_gun.bullets_in_magasine == 0 {
+                    if eq_gun.0.magazine.current == 0 {
                         println!("Out of bullets!!");
                     } else {
-                        eq_gun.bullets_in_magasine -= 1;
+                        eq_gun.0.magazine.current -= 1;
                     }
                 }
             }
@@ -234,43 +233,39 @@ pub fn player_enemy_collision(
 }
 
 pub fn reload_gun(
-    mut player_query: Query<&mut Ammo, With<Player>>,
+    mut ammo_inventory: ResMut<AmmoCount>,
     mut eq_gun: ResMut<EquippedGun>,
     kb_input: Res<Input<KeyCode>>,
-    mut reload_timer: ResMut<ReloadTimer>,
+    
 ) {
-    let gun_data = GunType {
-        gun_type: eq_gun.gun_type.clone(),
-    };
-
-    let gun_magasine_capacity = gun_data.magasine_size();
-    let gun_type = gun_data.gun_type.clone() as usize;
-    let gun_reload_time = gun_data.reload_time();
-
+    
+ 
     //handle crash if ammo vector does not exist cannot use unwrap
-    if let Ok(mut player_ammo) = player_query.get_single_mut() {
-        if kb_input.just_released(KeyCode::R) {
-            reload_timer.time.tick(Duration::from_secs_f32(1.5));
+   //get the r key input
+    if kb_input.just_pressed(KeyCode::R) {
 
-            if player_ammo.vec[gun_type] <= 0 {
-                println!("Out of bullets!!");
-                reload_timer.time.reset();
-            } else if eq_gun.bullets_in_magasine < gun_magasine_capacity {
-                println!("Reloading...");
-                // start timer, reloading take x amount of time
+        //check if the gun is already full
+        let diff = (eq_gun.0.magazine.capacity - eq_gun.0.magazine.current) as i32;
 
-                if reload_timer.time.elapsed().as_secs_f32() >= gun_reload_time.as_secs_f32() {
-                    // subtact bullets in the magasin from total capacity of magezine, then add that to the magasine
-                    player_ammo.vec[gun_type] -=
-                        (gun_magasine_capacity - eq_gun.bullets_in_magasine) as i32;
-                    eq_gun.bullets_in_magasine = gun_magasine_capacity;
-                    reload_timer.time.reset();
-                } else {
-                    println!("Reloading...");
+        if diff == 0 {
+            println!("Gun is already full");
+        }
+        else {
+            let x = (ammo_inventory.pistol as i32 - diff ) as i32;
+
+                if x < 0 {
+                    eq_gun.0.magazine.current += ammo_inventory.pistol;
+                    ammo_inventory.pistol = 0;
+                }
+                else {
+                    eq_gun.0.magazine.current = eq_gun.0.magazine.capacity;
+                    ammo_inventory.pistol -= diff as usize;
                 }
             }
+
         }
-    }
+}
+    
 
     //TODO fix the zero in 233 also need to add reload time
-}
+

@@ -5,11 +5,10 @@ use bevy_rapier2d::prelude::*;
 //use bevy::sprite::collide_aabb::{collide, Collision};
 
 use crate::components::EnemyCount;
-use crate::game::components::{
-    Alive, ColliderSquare, Enemy, GameTextures, Health, OnGameScreenMarker, Player, ARENA_SIZE,
-    ENEMY_BOOMER_SPRITE_SIZE, ENEMY_CRAWLER_SPRITE_SIZE, ENEMY_ZOOMER_SPRITE_SIZE, MAX_NUM_ENEMIES,
-    TILE_SIZE, TYPES_OF_ENEMIES,
-};
+
+use crate::game::components::{ColliderSquare, Enemy, Health, Player, Alive, GameTextures,  OnGameScreenMarker,
+    ARENA_SIZE, ENEMY_BOOMER_SPRITE_SIZE, ENEMY_CRAWLER_SPRITE_SIZE, ENEMY_ZOOMER_SPRITE_SIZE,
+    MAX_NUM_ENEMIES, TILE_SIZE, TYPES_OF_ENEMIES,};
 
 use rand::Rng;
 

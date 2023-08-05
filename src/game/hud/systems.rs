@@ -1,7 +1,7 @@
 use crate::components::GameScore;
 
 use crate::game::components::{
-    Ammo, AmmoText, EquippedGun, Health, HealthText, OnGameScreenMarker, Player, ScoreText,
+    AmmoCount, AmmoText, EquippedGun, Health, HealthText, OnGameScreenMarker, Player, ScoreText, GunType,
 };
 use bevy::prelude::*;
 
@@ -372,21 +372,25 @@ pub fn hud_score_update_system(
 
 pub fn hud_ammo_update_system(
     mut query: Query<&mut Text, With<AmmoText>>,
-    query_ammo: Query<&Ammo, With<Player>>,
+    ammo_inventory: Res<AmmoCount>,
     eq_gun: Res<EquippedGun>,
 ) {
     for mut text in &mut query {
-        if let Some(ammo) = query_ammo.iter().next() {
-            let bullet_in_mag = eq_gun.bullets_in_magasine;
+            let bullet_in_mag = eq_gun.0.magazine.current;
 
-            let bullets_in_inventory = ammo.vec[0];
+            let bullets_in_inventory = ammo_inventory.pistol;
+            
+                
+        
 
             // Update the value of the second section
             text.sections[1].value = format!("{bullet_in_mag:.2}");
             text.sections[3].value = format!("{bullets_in_inventory:.2}");
         }
+
     }
-}
+    
+
 
 pub fn hud_health_update_system(
     mut query: Query<&mut Text, With<HealthText>>,

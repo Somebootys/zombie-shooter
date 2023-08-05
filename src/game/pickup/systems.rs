@@ -3,7 +3,7 @@ use bevy::time::Stopwatch;
 use rand::Rng;
 
 use crate::game::components::{
-    Ammo, ColliderSquare, EquippedGun, GameTextures, GunType, Health, OnGameScreenMarker, PickUp,
+    AmmoCount, ColliderSquare, EquippedGun, GameTextures, GunType, Health, OnGameScreenMarker, PickUp,
     PickUpDuration, PickUpTimer, Player, ARENA_SIZE, PICKUP_SPRITE_SIZE, PICK_UP_DURATION,
     TILE_SIZE,
 };
@@ -76,18 +76,20 @@ pub fn despawn_pickup(
 pub fn pickup_health(
     mut commands: Commands,
     mut query: Query<(Entity, &Transform), With<PickUp>>,
-    mut player_query: Query<(&mut Health, &Transform, &mut Ammo), With<Player>>,
+    mut player_query: Query<(&mut Health, &Transform), With<Player>>,
     pickup_query: Query<&PickUp>,
-    gun: ResMut<EquippedGun>,
+    eq_gun: ResMut<EquippedGun>,
+    mut ammo_inventory: ResMut<AmmoCount>,
 ) {
-    let gun_data = GunType {
-        gun_type: gun.gun_type.clone(),
-    };
+    
 
-    let x = gun_data.gun_type.clone();
+    
 
     for (entity, transform_pickup) in query.iter_mut() {
-        for (mut player, transform_player, mut ammo) in player_query.iter_mut() {
+        for (mut player, transform_player) in player_query.iter_mut() {
+
+
+            //if player is close enough to pickup, pick it up
             let pickup = pickup_query.get(entity).unwrap();
             let relative_position = transform_pickup
                 .translation
@@ -102,7 +104,7 @@ pub fn pickup_health(
                 }
                 false => {
                     if relative_position < PICKUP_SPRITE_SIZE / 2.0_f32 {
-                        ammo.vec[x.clone() as usize] += gun_data.magasine_size().clone() as i32;
+                        ammo_inventory.pistol += eq_gun.0.magazine.capacity;
                         commands.entity(entity).despawn();
                     }
                 }

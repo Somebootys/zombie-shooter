@@ -3,11 +3,11 @@ use crate::components::{GameScore, WinSize};
 
 //this is the component file in src/game/components.rs
 use crate::game::components::{
-    DespawnedEnemies, EquippedGun, GameTextures, Guns, LastDamaged, MainCamera, PickUpTimer,
-    Player, ReloadTimer,
+    DespawnedEnemies, EquippedGun, GameTextures, Gun, LastDamaged, MainCamera, PickUpTimer,
+    Player, GunType, AmmoCount
 };
 
-use bevy::{prelude::*, time::Stopwatch, window::PrimaryWindow};
+use bevy::{prelude::*,  window::PrimaryWindow};
 
 //use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier2d::prelude::*;
@@ -59,7 +59,12 @@ pub fn setup(
         entities: HashSet::new(),
     });
 
-    //insert player being hit or not
+    //insert Ammo inventory 
+    commands.insert_resource(AmmoCount {
+        pistol: 0,
+        shotgun: 0,
+        machine_gun: 0,
+    });
 
     //insert last damaged time
 
@@ -72,20 +77,13 @@ pub fn setup(
         time: Timer::from_seconds(5.0, TimerMode::Once),
     });
 
-    let gun = EquippedGun {
-        gun_type: Guns::Pistol,
-        bullets_in_magasine: 8,
-        mag_capacity: 8,
-    };
+    let gun = EquippedGun(Gun::from_gun_type(GunType::Pistol));
     //insert equipped gun
     commands.insert_resource(gun);
 
-    let reload_timer = ReloadTimer {
-        time: Stopwatch::new(),
-    };
+   
 
-    //insert reload timer resource
-    commands.insert_resource(reload_timer);
+   
 }
 
 pub fn camera_movement(
