@@ -209,11 +209,15 @@ pub struct OnGameScreenMarker;
 
 #[derive(Resource, Debug)]
 pub struct ReloadTimer {
-    pub time: Stopwatch,
+    pub timer: Timer,
+    pub reloading: bool,
 }
 
 #[derive(Resource, Debug)]
-pub struct PlayerAngle(pub f32);
+pub struct PlayerOrientation{
+    pub angle: f32,
+    pub linvel: Vec2,
+}
 
 #[derive(Resource)]
 pub struct DespawnedEnemies {
@@ -249,3 +253,4 @@ pub struct PickUpTimer {
 
 #[derive(Resource, Debug, Clone)]
 pub struct EquippedGun (pub Gun);
+

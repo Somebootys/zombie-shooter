@@ -3,7 +3,7 @@ use bevy::time::Stopwatch;
 use rand::Rng;
 
 use crate::game::components::{
-    AmmoCount, ColliderSquare, EquippedGun, GameTextures, GunType, Health, OnGameScreenMarker, PickUp,
+    AmmoCount, ColliderSquare, EquippedGun, GameTextures, Health, OnGameScreenMarker, PickUp,
     PickUpDuration, PickUpTimer, Player, ARENA_SIZE, PICKUP_SPRITE_SIZE, PICK_UP_DURATION,
     TILE_SIZE,
 };
@@ -80,6 +80,7 @@ pub fn pickup_health(
     pickup_query: Query<&PickUp>,
     eq_gun: ResMut<EquippedGun>,
     mut ammo_inventory: ResMut<AmmoCount>,
+    asset_server: Res<AssetServer>,
 ) {
     
 
@@ -100,6 +101,17 @@ pub fn pickup_health(
                     if relative_position < PICKUP_SPRITE_SIZE / 2.0_f32 {
                         player.hp += 10;
                         commands.entity(entity).despawn();
+                        
+                        commands.spawn(AudioBundle{
+                            source: asset_server.load("audio/other/health_pickup.ogg"),
+                            ..default()
+                        });
+
+
+
+
+
+
                     }
                 }
                 false => {

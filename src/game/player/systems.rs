@@ -3,7 +3,7 @@ use crate::components::AppState;
 use crate::game::components::{
     AmmoCount, Bullet, ColliderSquare, CrossHair, Enemy, EquippedGun, Health, LastDamaged,
     MainCamera, Movable, OnGameScreenMarker, Player, PlayerDamagedTimer,
-    BULLET_SPRITE_DIMENSION, PLAYER_SPRITE_SIZE,
+    BULLET_SPRITE_DIMENSION, PLAYER_SPRITE_SIZE, ReloadTimer, PlayerOrientation
 };
 
 use bevy::prelude::*;
@@ -119,18 +119,91 @@ pub fn update_crosshair(
     }
 }
 
-pub fn rotate_player(
-    mut player_query: Query<&mut Transform, With<Player>>,
+pub fn fire_gun(mut player_query: Query<&mut Transform, With<Player>>,
     asset_server: Res<AssetServer>,
     buttons: Res<Input<MouseButton>>,
     mut cmd: Commands,
+    mut eq_gun: ResMut<EquippedGun>,
+     player_orientation: ResMut<PlayerOrientation>,
+    
+){
+    //TODO: review if this is the best way to handle the offset
+        
+        
+    if let Ok(transform) = player_query.get_single_mut() {
+        
+
+        let angle = player_orientation.angle.clone();
+    if buttons.just_released(MouseButton::Left) && eq_gun.0.magazine.current < 1 {
+
+        println!("Gun is empty");  
+
+        cmd.spawn((
+           AudioBundle {
+               source: asset_server.load("audio/gun/9mm-Pistol-Dry-Fire.ogg"),
+               ..default()
+           },
+        )); 
+       } else if buttons.just_released(MouseButton::Left) && eq_gun.0.magazine.current  > 0 {
+
+           eq_gun.0.magazine.current -= 1;
+           
+       
+           let c = PLAYER_SPRITE_SIZE.clone();
+           let a = libm::cosf(angle) * c;
+           let b: f32 = libm::sinf(angle) * c;
+
+           let offset_laser_x = a;
+           let offset_laser_y = b;
+           let mut spawn_transform = Transform::from_scale(Vec3::splat(1.0));
+           spawn_transform.translation =
+               transform.translation + Vec3::new(offset_laser_x, offset_laser_y, 5.0);
+           spawn_transform.rotation =
+               Quat::from_axis_angle(Vec3::new(0., 0., 1.), angle - PI / 2.0_f32);
+
+           cmd.spawn((
+               SpriteBundle {
+                   transform: spawn_transform,
+                   texture: asset_server.load("graphic/laser_a_01.png"),
+                   ..default()
+               },
+               AudioBundle {
+                   source: asset_server.load("audio/gun/9mm-Single.ogg"),
+
+                   ..default()
+               },
+               Bullet { angle: player_orientation.angle },
+               Movable { auto_despawn: true },
+               Velocity {
+                   linvel: player_orientation.linvel,
+                   angvel: player_orientation.angle,
+               },
+           ))
+           //add collider to spawned bullet
+           .insert(ColliderSquare {
+               dimension: BULLET_SPRITE_DIMENSION,
+           });
+           
+               
+
+              
+           }
+        }
+           
+}
+
+pub fn rotate_player(
+    mut player_query: Query<&mut Transform, With<Player>>,
+   
 
     // need to get window dimensions
     mut windows: Query<&mut Window>,
     // query to get camera transform
     camera_q: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    mut player_orientation: ResMut<PlayerOrientation>,
 
-    mut eq_gun: ResMut<EquippedGun>,
+    
+   
 ) {
     // get the camera info and transform
     // assuming there is exactly one main camera entity, so query::single() is OK. However, adding more states, I need get_single, and I need to handle potential 'no camera'-cases
@@ -153,51 +226,19 @@ pub fn rotate_player(
                 let angle = libm::atan2f(world_position.y - y, world_position.x - x);
                 let diff = world_position - Vec2::new(x, y);
 
+                player_orientation.angle = angle;
+                player_orientation.linvel = diff.normalize();
+
+
                 //Rotate the sprite around the z axis by the angle. transform.rotation takes a Quat, also needs to be in radians, so no need to convert the angle.
                 transform.rotation = Quat::from_rotation_z(angle);
 
-                //TODO: review if this is the best way to handle the offset
-
-                if buttons.just_released(MouseButton::Left) && eq_gun.0.magazine.current > 0 {
-                    let c = PLAYER_SPRITE_SIZE.clone();
-                    let a = libm::cosf(angle) * c;
-                    let b: f32 = libm::sinf(angle) * c;
-
-                    let offset_laser_x = a;
-                    let offset_laser_y = b;
-                    let mut spawn_transform = Transform::from_scale(Vec3::splat(1.0));
-                    spawn_transform.translation =
-                        transform.translation + Vec3::new(offset_laser_x, offset_laser_y, 5.0);
-                    spawn_transform.rotation =
-                        Quat::from_axis_angle(Vec3::new(0., 0., 1.), angle - PI / 2.0_f32);
-
-                    cmd.spawn((
-                        SpriteBundle {
-                            transform: spawn_transform,
-                            texture: asset_server.load("graphic/laser_a_01.png"),
-                            ..default()
-                        },
-                        Bullet { angle: angle },
-                        Movable { auto_despawn: true },
-                        Velocity {
-                            linvel: diff.normalize(),
-                            angvel: angle,
-                        },
-                    ))
-                    //add collider to spawned bullet
-                    .insert(ColliderSquare {
-                        dimension: BULLET_SPRITE_DIMENSION,
-                    });
-                    if eq_gun.0.magazine.current == 0 {
-                        println!("Out of bullets!!");
-                    } else {
-                        eq_gun.0.magazine.current -= 1;
-                    }
+                
                 }
-            }
         }
     }
 }
+
 
 pub fn player_enemy_collision(
     mut player: Query<(Entity, &ColliderSquare, &Transform, &mut Health), With<Player>>,
@@ -205,6 +246,7 @@ pub fn player_enemy_collision(
     mut cmd: Commands,
     time: Res<Time>,
     mut player_hit: ResMut<LastDamaged>,
+    asset_server: Res<AssetServer>,
 ) {
     for (player_entity, player_collider, player_transform, mut player) in &mut player.iter_mut() {
         for (enemy_collider, enemy_transform) in &mut query_enemy.iter() {
@@ -223,6 +265,12 @@ pub fn player_enemy_collision(
 
                     if player.hp <= 0 {
                         cmd.entity(player_entity).despawn_recursive();
+                        cmd.spawn((
+                            AudioBundle {
+                                source: asset_server.load("audio/other/death_voice.ogg"),
+                                ..default()
+                            },
+                        ));
                     }
 
                     player_hit.time.reset();
@@ -232,25 +280,72 @@ pub fn player_enemy_collision(
     }
 }
 
+pub fn update_timer(
+    time: Res<Time>,
+    mut state: ResMut<ReloadTimer>,
+    
+    
+) {
+    // assume we have exactly one player that jumps with Spacebar
+  
+    if !state.reloading {
+        // Check if the timer has finished
+        if state.timer.tick(time.delta()).just_finished() {
+            state.reloading = true; // Allow pressing "R" again after the delay
+        }
+    }
+   
+}
+
 pub fn reload_gun(
     mut ammo_inventory: ResMut<AmmoCount>,
     mut eq_gun: ResMut<EquippedGun>,
     kb_input: Res<Input<KeyCode>>,
+    mut cmd: Commands,
+    asset_server: Res<AssetServer>,
+    mut reloader: ResMut<ReloadTimer>,
+    time : Res<Time>,
+    
     
 ) {
-    
- 
-    //handle crash if ammo vector does not exist cannot use unwrap
-   //get the r key input
-    if kb_input.just_pressed(KeyCode::R) {
 
+    //println!("timer: {:?}", reload_timer.timer);
+   
+       
+     
         //check if the gun is already full
         let diff = (eq_gun.0.magazine.capacity - eq_gun.0.magazine.current) as i32;
+       //handle crash if ammo vector does not exist cannot use unwrap
+   //get the r key input
+    if kb_input.just_pressed(KeyCode::R)  {  
+        
+      
+        
+       
+
+        
 
         if diff == 0 {
             println!("Gun is already full");
         }
-        else {
+        else if ammo_inventory.pistol == 0 {
+            println!("No ammo left");
+        }
+        else if reloader.reloading   {
+            
+            reloader.timer.tick(time.delta());
+
+            //make sure the replay sound has finished before you can shoot or reload
+
+            cmd.spawn((
+                AudioBundle {
+                    source: asset_server.load("audio/gun/9mm-Pistol-Reload.ogg"),
+                    ..default()
+                },
+            ));
+
+
+
             let x = (ammo_inventory.pistol as i32 - diff ) as i32;
 
                 if x < 0 {
@@ -261,9 +356,16 @@ pub fn reload_gun(
                     eq_gun.0.magazine.current = eq_gun.0.magazine.capacity;
                     ammo_inventory.pistol -= diff as usize;
                 }
+                
+
+            
             }
 
+            reloader.reloading = false;
+            reloader.timer.reset();
+
         }
+       
 }
     
 

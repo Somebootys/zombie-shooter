@@ -4,8 +4,9 @@ use crate::components::{GameScore, WinSize};
 //this is the component file in src/game/components.rs
 use crate::game::components::{
     DespawnedEnemies, EquippedGun, GameTextures, Gun, LastDamaged, MainCamera, PickUpTimer,
-    Player, GunType, AmmoCount
+    Player, GunType, AmmoCount, PlayerOrientation, ReloadTimer
 };
+
 
 use bevy::{prelude::*,  window::PrimaryWindow};
 
@@ -21,6 +22,7 @@ pub fn setup(
     mut commands: Commands,
     query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,
+   
 ) {
     //win resource init
     let Ok(primary) = query.get_single() else {
@@ -34,6 +36,12 @@ pub fn setup(
     };
 
     commands.insert_resource(win_size);
+
+    //insert player angle
+    commands.insert_resource(PlayerOrientation{
+        angle: 0.0,
+        linvel: Vec2::new(0.0, 0.0),
+    });
 
     //insert score resource
     let score = GameScore(0);
@@ -80,6 +88,12 @@ pub fn setup(
     let gun = EquippedGun(Gun::from_gun_type(GunType::Pistol));
     //insert equipped gun
     commands.insert_resource(gun);
+
+    //insert reload timer
+    commands.insert_resource(ReloadTimer {
+        timer: Timer::from_seconds(1.2, TimerMode::Once),
+        reloading: false,
+    });
 
    
 

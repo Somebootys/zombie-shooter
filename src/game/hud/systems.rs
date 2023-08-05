@@ -1,7 +1,7 @@
 use crate::components::GameScore;
 
 use crate::game::components::{
-    AmmoCount, AmmoText, EquippedGun, Health, HealthText, OnGameScreenMarker, Player, ScoreText, GunType,
+    AmmoCount, AmmoText, EquippedGun, Health, HealthText, OnGameScreenMarker, Player, ScoreText, 
 };
 use bevy::prelude::*;
 

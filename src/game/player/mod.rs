@@ -17,8 +17,10 @@ impl Plugin for PlayerPlugin {
                     player_movement,
                     update_crosshair,
                     rotate_player,
+                    fire_gun.after(rotate_player),
                     player_enemy_collision,
                     reload_gun,
+                    update_timer,
                 )
                     .run_if(in_state(AppState::InGame)),
             );

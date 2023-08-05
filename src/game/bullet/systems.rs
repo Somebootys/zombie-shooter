@@ -45,6 +45,7 @@ pub fn bullet_enemy_collision(
     mut enemy: Query<(Entity, &mut Health), With<Enemy>>,
     mut killed_enemies: ResMut<DespawnedEnemies>,
     mut cmd: Commands,
+    asset_server: Res<AssetServer>,
 ) {
     let mut despawned_entities: HashSet<Entity> = HashSet::new();
 
@@ -80,9 +81,24 @@ pub fn bullet_enemy_collision(
                         health.hp -= 10;
                         println!("Enemy health: {:?}", health.hp);
                         if health.hp <= 0 {
+
+                            //spawn a blood splat instead of the enemy
+                            cmd.spawn((SpriteBundle {
+                                texture: asset_server.load("graphic/blood.png"),
+                                transform: Transform::from_translation(Vec3::new(
+                                    enemy_transform.translation.x,
+                                    enemy_transform.translation.y,
+                                    0.0,
+                                )),
+                                ..Default::default()
+                            },));
+                            
+                            //remove the enemy
                             cmd.entity(enemy_entity).despawn();
                             despawned_entities.insert(enemy_entity);
                             killed_enemies.entities.insert(enemy_entity);
+
+                            
                         }
                     }
                 }
