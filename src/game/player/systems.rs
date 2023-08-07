@@ -6,15 +6,15 @@ use crate::game::components::{
     BULLET_SPRITE_DIMENSION, PLAYER_SPRITE_SIZE, ReloadTimer, PlayerOrientation
 };
 
+use bevy::audio::PlaybackMode;
 use bevy::prelude::*;
 use bevy::window::Window;
 use bevy_rapier2d::prelude::*;
-//use bevy_rapier2d::prelude::*;
+
 use bevy::sprite::collide_aabb::collide;
 use libm;
 use std::f32::consts::PI;
-//use std::time::Duration;
-//use bevy::utils::Duration;
+
 
 const PLAYER_SPEED: f32 = 500.0;
 
@@ -125,6 +125,7 @@ pub fn fire_gun(mut player_query: Query<&mut Transform, With<Player>>,
     mut cmd: Commands,
     mut eq_gun: ResMut<EquippedGun>,
      player_orientation: ResMut<PlayerOrientation>,
+     reloading: Res<ReloadTimer>,
     
 ){
     //TODO: review if this is the best way to handle the offset
@@ -134,17 +135,24 @@ pub fn fire_gun(mut player_query: Query<&mut Transform, With<Player>>,
         
 
         let angle = player_orientation.angle.clone();
-    if buttons.just_released(MouseButton::Left) && eq_gun.0.magazine.current < 1 {
+       
+
+    if !reloading.reloading { 
+    if buttons.just_released(MouseButton::Left) && eq_gun.0.magazine.current <= 0  {
 
         println!("Gun is empty");  
 
         cmd.spawn((
            AudioBundle {
                source: asset_server.load("audio/gun/9mm-Pistol-Dry-Fire.ogg"),
+               settings : PlaybackSettings {
+                   mode: PlaybackMode::Despawn,
+                   ..default()
+               },
                ..default()
            },
         )); 
-       } else if buttons.just_released(MouseButton::Left) && eq_gun.0.magazine.current  > 0 {
+       } else if buttons.just_released(MouseButton::Left) && eq_gun.0.magazine.current  > 0  {
 
            eq_gun.0.magazine.current -= 1;
            
@@ -167,11 +175,7 @@ pub fn fire_gun(mut player_query: Query<&mut Transform, With<Player>>,
                    texture: asset_server.load("graphic/laser_a_01.png"),
                    ..default()
                },
-               AudioBundle {
-                   source: asset_server.load("audio/gun/9mm-Single.ogg"),
-
-                   ..default()
-               },
+               
                Bullet { angle: player_orientation.angle },
                Movable { auto_despawn: true },
                Velocity {
@@ -179,16 +183,27 @@ pub fn fire_gun(mut player_query: Query<&mut Transform, With<Player>>,
                    angvel: player_orientation.angle,
                },
            ))
+
+           
            //add collider to spawned bullet
            .insert(ColliderSquare {
                dimension: BULLET_SPRITE_DIMENSION,
            });
-           
-               
+           //spawn bullet sound separately so it does not get despawned with the bullet. Hoping this will fix laggy sound
+               cmd.spawn(AudioBundle {
+                source: asset_server.load("audio/gun/9mm-Single.ogg"),
+               settings:  PlaybackSettings {
+                 mode: PlaybackMode::Despawn,
+                 ..default()
+             },
+
+                ..default()
+            },);
 
               
            }
-        }
+        }}
+       
            
 }
 
@@ -264,13 +279,29 @@ pub fn player_enemy_collision(
                     player.hp -= 10;
 
                     if player.hp <= 0 {
-                        cmd.entity(player_entity).despawn_recursive();
-                        cmd.spawn((
+                        
+                        cmd.spawn((SpriteBundle {
+                            texture: asset_server.load("graphic/blood.png"),
+                            transform: Transform::from_translation(Vec3::new(
+                                player_transform.translation.x,
+                                player_transform.translation.y,
+                                5.0,
+                            )),
+                            ..Default::default()
+                
+                        },
                             AudioBundle {
                                 source: asset_server.load("audio/other/death_voice.ogg"),
+                                settings: PlaybackSettings {
+                                    // I want my splat entity to remain after the sound has finished playing, but I don't need to sound entity/component itself to remain
+                                    mode: PlaybackMode::Remove,
+                                    ..default()
+                                },
                                 ..default()
                             },
+                            OnGameScreenMarker,
                         ));
+                        cmd.entity(player_entity).despawn_recursive();
                     }
 
                     player_hit.time.reset();
@@ -282,16 +313,16 @@ pub fn player_enemy_collision(
 
 pub fn update_timer(
     time: Res<Time>,
-    mut state: ResMut<ReloadTimer>,
+    mut reload: ResMut<ReloadTimer>,
     
     
 ) {
     // assume we have exactly one player that jumps with Spacebar
   
-    if !state.reloading {
+    if reload.reloading {
         // Check if the timer has finished
-        if state.timer.tick(time.delta()).just_finished() {
-            state.reloading = true; // Allow pressing "R" again after the delay
+        if reload.timer.tick(time.delta()).just_finished() {
+            reload.reloading = false; // Allow pressing "R" again after the delay
         }
     }
    
@@ -331,7 +362,7 @@ pub fn reload_gun(
         else if ammo_inventory.pistol == 0 {
             println!("No ammo left");
         }
-        else if reloader.reloading   {
+        else if reloader.reloading == false && ammo_inventory.pistol > 0 && diff > 0  {
             
             reloader.timer.tick(time.delta());
 
@@ -357,12 +388,12 @@ pub fn reload_gun(
                     ammo_inventory.pistol -= diff as usize;
                 }
                 
-
+                reloader.reloading = true;
+                reloader.timer.reset();
             
             }
 
-            reloader.reloading = false;
-            reloader.timer.reset();
+           
 
         }
        

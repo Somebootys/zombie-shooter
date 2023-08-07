@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
-use crate::components::AppState;
+use crate::components::{GameScore, AppState, Wave};
 
 use crate::game::components::{
-    Bullet, ColliderSquare, DespawnedEnemies, Enemy, Health, Movable, BULLETSPEED,
+    Bullet, ColliderSquare, DespawnedEnemies, Enemy, Health, Movable, BULLETSPEED,OnGameScreenMarker,  
 };
 
 use bevy::sprite::collide_aabb::collide;
@@ -46,6 +46,7 @@ pub fn bullet_enemy_collision(
     mut killed_enemies: ResMut<DespawnedEnemies>,
     mut cmd: Commands,
     asset_server: Res<AssetServer>,
+    mut score: ResMut<GameScore>,
 ) {
     let mut despawned_entities: HashSet<Entity> = HashSet::new();
 
@@ -82,17 +83,22 @@ pub fn bullet_enemy_collision(
                         println!("Enemy health: {:?}", health.hp);
                         if health.hp <= 0 {
 
+                            //10 points for killing an enemy
+                            score.0 += 10;
+
+
                             //spawn a blood splat instead of the enemy
                             cmd.spawn((SpriteBundle {
                                 texture: asset_server.load("graphic/blood.png"),
                                 transform: Transform::from_translation(Vec3::new(
                                     enemy_transform.translation.x,
                                     enemy_transform.translation.y,
-                                    0.0,
+                                    5.0,
                                 )),
                                 ..Default::default()
-                            },));
-                            
+                            },
+                            OnGameScreenMarker,));
+
                             //remove the enemy
                             cmd.entity(enemy_entity).despawn();
                             despawned_entities.insert(enemy_entity);
@@ -110,10 +116,15 @@ pub fn bullet_enemy_collision(
 }
 
 pub fn next_level(
-    killed_enemies: ResMut<DespawnedEnemies>,
+    mut killed_enemies: ResMut<DespawnedEnemies>,
     mut state: ResMut<NextState<AppState>>,
+    mut wave: ResMut<Wave>,
+    
 ) {
-    if killed_enemies.entities.len() == 9 {
+    if killed_enemies.entities.len() == 10 {
+        wave.0 += 1;
         state.set(AppState::LevelUp);
+        //reset the despawned enemies
+        killed_enemies.entities.clear();
     }
 }

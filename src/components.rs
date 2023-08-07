@@ -37,3 +37,6 @@ pub struct GameScore(pub i32);
 
 #[derive(Resource)]
 pub struct EnemyCount(pub usize);
+
+#[derive(Resource, Debug, Clone)]
+pub struct Wave (pub usize);

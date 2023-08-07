@@ -1,5 +1,5 @@
 //this is the component file in src/components.rs
-use crate::components::{GameScore, WinSize};
+use crate::components::{GameScore, WinSize, Wave};
 
 //this is the component file in src/game/components.rs
 use crate::game::components::{
@@ -94,6 +94,9 @@ pub fn setup(
         timer: Timer::from_seconds(1.2, TimerMode::Once),
         reloading: false,
     });
+
+    //insert wave resource
+    commands.insert_resource(Wave(1));
 
    
 
